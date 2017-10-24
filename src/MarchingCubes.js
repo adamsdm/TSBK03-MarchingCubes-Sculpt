@@ -4,11 +4,10 @@ function MarchingCubes(size, resolution){
 
     this.resolution = resolution || 10;
     this.size = size || 10;
-    var dx = dy = dz = this.size / this.resolution;
+    this.dx = this.dy = this.dz = this.size / this.resolution;
     this.data = intializeData();
 
     var geometry = new THREE.Geometry();
-    
     geometry.vertices.push(
         new THREE.Vector3( -10,  10, 0 ),
         new THREE.Vector3( -10, -10, 0 ),
@@ -20,11 +19,33 @@ function MarchingCubes(size, resolution){
     var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
     var mesh = new THREE.Mesh( geometry, material );
 
-    return mesh;
+    function dist(x1, y1, z1, x2, y2, z2){
+        return Math.sqrt( Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
+    }
 
     function intializeData(){
-        var d = new Array();
+        var data = new Array();
+
+        for(var i=0; i < this.resolution; i++){
+            data[i] = new Array();
+            for(var j=0; j < this.resolution; j++){
+                data[i][j] = new Array();
+
+                for(var k=0; k < this.resolution; k++){
+                    var pos = new THREE.Vector3(i*dx, j*dy, k*dz);
+                    data[i][j][k] = dist(pos.x, pos.y, pos.z, 0, 0, 0) - (this.size / 2);
+                }   
+            }
+        }
+        return data;
     }
+    
+
+    
+    
+    return mesh;
+
+    
 
     // Lookup tables from Paul Bourke's implementation
     // http://paulbourke.net/geometry/polygonise/

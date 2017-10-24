@@ -36,7 +36,7 @@ function init() {
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
     // Marching cubes
-    var resolution = 10;
+    var resolution = 20;
     var size = 10;
     var volume = MarchingCubes(size, resolution);
     volume.scale.set(2,2,2);
