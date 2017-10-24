@@ -16,11 +16,12 @@ shaders.shaderSetLoaded = function(){
     animate();
 }
 
+
+
 function init() {
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x000000 );
-    scene.fog = new THREE.FogExp2( 0x000000, 0.002 );
+    scene.background = new THREE.Color( 0x42cbf4 );
 
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio( window.devicePixelRatio );
@@ -30,7 +31,7 @@ function init() {
     container.appendChild( renderer.domElement );
 
     camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-    camera.position.z = 500;
+    camera.position.z = 200;
 
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -39,9 +40,8 @@ function init() {
     var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
     var mesh = new THREE.Mesh( geometry, material );
-    mesh.position.x = 0;
-    mesh.position.y = 0;
-    mesh.position.z = 0;
+    
+    mesh.position.set(0, 0, 0);
     mesh.updateMatrix();
     mesh.matrixAutoUpdate = false;
     scene.add( mesh );
@@ -59,12 +59,8 @@ function init() {
     var light = new THREE.AmbientLight( 0x222222 );
     scene.add( light );
 
-    //
-
     stats = new Stats();
     container.appendChild( stats.dom );
-
-    //
 
     window.addEventListener( 'resize', onWindowResize, false );
 
