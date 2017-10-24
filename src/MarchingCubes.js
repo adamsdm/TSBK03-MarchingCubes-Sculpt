@@ -6,11 +6,13 @@ function MarchingCubes(size, resolution){
     this.size = size || 10;
     this.dx = this.dy = this.dz = this.size / this.resolution;
     this.data = intializeData();
-
+    this.gridCells = initCells();
+    console.log(gridCells);
     
     
     geometry = new THREE.Geometry();
     sprite = new THREE.TextureLoader().load( "ball.png" );
+    var isoLevel = 10;
 
     for ( i = 0; i < resolution; i ++ ) {
         for ( j = 0; j < resolution; j ++ ) {
@@ -21,7 +23,7 @@ function MarchingCubes(size, resolution){
                 vertex.z = k*dz - (this.size/2);
 
 
-                if(this.data[i][j][k] < 11)
+                if(this.data[i][j][k] < isoLevel)
                     geometry.vertices.push( vertex );
             }
         }
@@ -34,6 +36,48 @@ function MarchingCubes(size, resolution){
 
 
 
+    function initCells()
+    {
+        var gridCells = [];
+        for ( i = 0; i < resolution - 1; i ++ ) {
+            for ( j = 0; j < resolution - 1; j ++ ) {
+                for ( k = 0; k < resolution - 1; k ++ ) {
+                    //create a grid cell
+                    //isoValues contains isovalue at each vertex/corner of cube
+                    var isoValues = [];
+                    //bottom verrices of cube
+                    isoValues.push(this.data[i][j][k]);
+                    isoValues.push(this.data[i+1][j][k]);
+                    isoValues.push(this.data[i+1][j][k+1]);
+                    isoValues.push(this.data[i][j][k+1]);
+                    //top verrices of cube
+                    isoValues.push(this.data[i][j+1][k]);
+                    isoValues.push(this.data[i+1][j+1][k]);
+                    isoValues.push(this.data[i+1][j+1][k+1]);
+                    isoValues.push(this.data[i][j+1][k+1]);
+
+                    var positions = [];
+                    positions.push( new THREE.Vector3(i*dx,j*dy,k*dz));
+                    positions.push( new THREE.Vector3((i+1)*dx,j*dy,k*dz));
+                    positions.push( new THREE.Vector3((i+1)*dx,j*dy,(k+1)*dz));
+                    positions.push( new THREE.Vector3(i*dx,j*dy,(k+1)*dz));
+
+                    positions.push( new THREE.Vector3(i*dx,(j+1)*dy,k*dz));
+                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy,k*dz));
+                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy,(k+1)*dz));
+                    positions.push( new THREE.Vector3(i*dx,(j+1)*dy,(k+1)*dz));
+
+                    var gridCell = {
+                        positions: positions,
+                        isoValues: isoValues
+                    };
+
+                    gridCells.push(gridCell);
+                }
+            }
+        }
+        return gridCells;
+    }
 
     function dist(x1, y1, z1, x2, y2, z2){
         return Math.sqrt( Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
