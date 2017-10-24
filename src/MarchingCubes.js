@@ -1,6 +1,11 @@
 
 
-function MarchingCubes(){
+function MarchingCubes(size, resolution){
+
+    this.resolution = resolution || 10;
+    this.size = size || 10;
+    var dx = dy = dz = this.size / this.resolution;
+    this.data = intializeData();
 
     var geometry = new THREE.Geometry();
     
@@ -11,12 +16,15 @@ function MarchingCubes(){
     );
     
     geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-    
     geometry.computeBoundingSphere();
     var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
     var mesh = new THREE.Mesh( geometry, material );
 
     return mesh;
+
+    function intializeData(){
+        var d = new Array();
+    }
 
     // Lookup tables from Paul Bourke's implementation
     // http://paulbourke.net/geometry/polygonise/
