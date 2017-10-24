@@ -1,38 +1,51 @@
-
-
 function MarchingCubes(size, resolution){
 
-    this.resolution = resolution || 10;
-    this.size = size || 10;
-    this.dx = this.dy = this.dz = this.size / this.resolution;
-    this.data = intializeData();
 
+    var context = this;
     
+
+    this.init = function(){
+        this.resolution = resolution || 10;
+        this.size = size || 10;
+        this.dx = this.dy = this.dz = this.size / this.resolution;
+        this.data = intializeData();
     
-    geometry = new THREE.Geometry();
-    sprite = new THREE.TextureLoader().load( "ball.png" );
+        this.isolation = 20;
+        
+        // DEBUG //
+        setupBillboards()
+    }
+    
 
-    for ( i = 0; i < resolution; i ++ ) {
-        for ( j = 0; j < resolution; j ++ ) {
-            for ( k = 0; k < resolution; k ++ ) {
-                var vertex = new THREE.Vector3();
-                vertex.x = i*dx - (this.size/2);
-                vertex.y = j*dy - (this.size/2);
-                vertex.z = k*dz - (this.size/2);
-
-
-                if(this.data[i][j][k] < 11)
-                    geometry.vertices.push( vertex );
-            }
-        }
+    this.setISO = function(value){
+        this.isolation = value;
+        setupBillboards();
     }
 
-    material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
-    material.color.setHSL( 1.0, 0.3, 0.7 );
-    particles = new THREE.Points( geometry, material );
+    function setupBillboards(){
+        var geometry = new THREE.Geometry();
+        geometry.verticesNeedsUpdate = true;
+        sprite = new THREE.TextureLoader().load( "ball.png" );
 
+        for ( i = 0; i < resolution; i ++ ) {
+            for ( j = 0; j < resolution; j ++ ) {
+                for ( k = 0; k < resolution; k ++ ) {
+                    var vertex = new THREE.Vector3();
+                    vertex.x = i*dx - (this.size/2);
+                    vertex.y = j*dy - (this.size/2);
+                    vertex.z = k*dz - (this.size/2);
+    
+    
+                    if(this.data[i][j][k] < this.isolation)
+                        geometry.vertices.push( vertex );
+                }
+            }
+        }
 
-
+        var material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
+        material.color.setHSL( 1.0, 0.3, 0.7 );
+        this.particles = new THREE.Points( geometry, material );
+    }
 
 
     function dist(x1, y1, z1, x2, y2, z2){
@@ -56,7 +69,7 @@ function MarchingCubes(size, resolution){
         return data;
     }
     
-    return particles;
+    return context;
 
     
 

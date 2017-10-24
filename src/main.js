@@ -2,7 +2,9 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var stats;
 
+
 var camera, controls, scene, renderer;
+var volume;
 
 var pathToShaders = '/src/shaders';
 var pathToChunks  = '/src/chunks';
@@ -14,9 +16,13 @@ shaders.load( 'frag' , 'FRAG'  , 'fragment'    );
 shaders.shaderSetLoaded = function(){
     init();
     animate();
+    displayGUI();
 }
 
-
+// Initial parameter values
+var parameters = {
+    isolation: 20
+}
 
 function init() {
 
@@ -38,13 +44,12 @@ function init() {
     // Marching cubes
     var resolution = 26;
     var size = 51;
-    var volume = MarchingCubes(size, resolution);
-    volume.scale.set(2,2,2);
-    scene.add( volume );
+    volume = MarchingCubes(size, resolution);
+    volume.init();
+    scene.add( volume.particles );
 
 
     // lights
-
     var light = new THREE.DirectionalLight( 0xffffff );
     light.position.set( 1, 1, 1 );
     scene.add( light );
@@ -60,6 +65,20 @@ function init() {
     container.appendChild( stats.dom );
 
     window.addEventListener( 'resize', onWindowResize, false );
+
+}
+
+function displayGUI(){
+    var gui = new dat.GUI();
+    var jar;
+
+
+    var simulationFolder = gui.addFolder('Simulation');
+    simulationFolder.open();
+    var isoVal = simulationFolder.add(parameters, 'isolation').min(10.0).max(40).step(0.01).name('Isolation');
+
+
+    isoVal.onChange(function(jar){ volume.setISO(jar); })
 
 }
 
