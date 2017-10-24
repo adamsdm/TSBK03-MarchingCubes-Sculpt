@@ -35,16 +35,11 @@ function init() {
 
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-    // world
-    var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-    var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
-
-    var mesh = new THREE.Mesh( geometry, material );
-    
-    mesh.position.set(0, 0, 0);
-    mesh.updateMatrix();
-    mesh.matrixAutoUpdate = false;
-    scene.add( mesh );
+    // Marching cubes
+    var a = MarchingCubes();
+    console.log(a);
+    a.scale.set(10,10,10);
+    scene.add( a );
 
     // lights
 
