@@ -30,17 +30,18 @@ function init() {
     var container = document.getElementById('container');
     container.appendChild( renderer.domElement );
 
-    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-    camera.position.z = 200;
+    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+    camera.position.set(0,0,100);
 
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
     // Marching cubes
-    var resolution = 20;
-    var size = 10;
+    var resolution = 26;
+    var size = 51;
     var volume = MarchingCubes(size, resolution);
     volume.scale.set(2,2,2);
     scene.add( volume );
+
 
     // lights
 

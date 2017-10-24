@@ -7,17 +7,33 @@ function MarchingCubes(size, resolution){
     this.dx = this.dy = this.dz = this.size / this.resolution;
     this.data = intializeData();
 
-    var geometry = new THREE.Geometry();
-    geometry.vertices.push(
-        new THREE.Vector3( -10,  10, 0 ),
-        new THREE.Vector3( -10, -10, 0 ),
-        new THREE.Vector3(  10, -10, 0 )
-    );
     
-    geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-    geometry.computeBoundingSphere();
-    var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-    var mesh = new THREE.Mesh( geometry, material );
+    
+    geometry = new THREE.Geometry();
+    sprite = new THREE.TextureLoader().load( "ball.png" );
+
+    for ( i = 0; i < resolution; i ++ ) {
+        for ( j = 0; j < resolution; j ++ ) {
+            for ( k = 0; k < resolution; k ++ ) {
+                var vertex = new THREE.Vector3();
+                vertex.x = i*dx - (this.size/2);
+                vertex.y = j*dy - (this.size/2);
+                vertex.z = k*dz - (this.size/2);
+
+
+                if(this.data[i][j][k] < 11)
+                    geometry.vertices.push( vertex );
+            }
+        }
+    }
+
+    material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
+    material.color.setHSL( 1.0, 0.3, 0.7 );
+    particles = new THREE.Points( geometry, material );
+
+
+
+
 
     function dist(x1, y1, z1, x2, y2, z2){
         return Math.sqrt( Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
@@ -33,17 +49,14 @@ function MarchingCubes(size, resolution){
 
                 for(var k=0; k < this.resolution; k++){
                     var pos = new THREE.Vector3(i*dx, j*dy, k*dz);
-                    data[i][j][k] = dist(pos.x, pos.y, pos.z, 0, 0, 0) - (this.size / 2);
+                    data[i][j][k] = Math.abs(dist(pos.x, pos.y, pos.z, size/2, size/2, size/2));
                 }   
             }
         }
         return data;
     }
     
-
-    
-    
-    return mesh;
+    return particles;
 
     
 
