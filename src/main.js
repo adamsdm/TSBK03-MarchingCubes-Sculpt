@@ -36,10 +36,9 @@ function init() {
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
     // Marching cubes
-    var a = MarchingCubes();
-    console.log(a);
-    a.scale.set(10,10,10);
-    scene.add( a );
+    var volume = MarchingCubes();
+    volume.scale.set(2,2,2);
+    scene.add( volume );
 
     // lights
 
