@@ -7,12 +7,15 @@ function MarchingCubes(size, resolution){
     this.dx = this.dy = this.dz = this.size / this.resolution;
     this.data = intializeData();
     this.gridCells = initCells();
-    console.log(gridCells);
-    
+    this.isoLevel = 10;
+
+    for (var i = 0; i < this.gridCells.length; i++)
+    {
+        polygonise(this.gridCells[i]);
+    }
     
     geometry = new THREE.Geometry();
     sprite = new THREE.TextureLoader().load( "ball.png" );
-    var isoLevel = 10;
 
     for ( i = 0; i < resolution; i ++ ) {
         for ( j = 0; j < resolution; j ++ ) {
@@ -23,7 +26,7 @@ function MarchingCubes(size, resolution){
                 vertex.z = k*dz - (this.size/2);
 
 
-                if(this.data[i][j][k] < isoLevel)
+                if(this.data[i][j][k] < this.isoLevel)
                     geometry.vertices.push( vertex );
             }
         }
@@ -34,7 +37,91 @@ function MarchingCubes(size, resolution){
     particles = new THREE.Points( geometry, material );
 
 
+    function polygonise(gridCell)
+    {
+        var cubeindex = 0;
+        var vertlist = []; //contains xyz positions
+        var ntriang = 0;
 
+        if (gridCell.isoValues[0] < this.isoLevel) cubeindex |= 1;
+        if (gridCell.isoValues[1] < this.isoLevel) cubeindex |= 2;
+        if (gridCell.isoValues[2] < this.isoLevel) cubeindex |= 4;
+        if (gridCell.isoValues[3] < this.isoLevel) cubeindex |= 8;
+        if (gridCell.isoValues[4] < this.isoLevel) cubeindex |= 16;
+        if (gridCell.isoValues[5] < this.isoLevel) cubeindex |= 32;
+        if (gridCell.isoValues[6] < this.isoLevel) cubeindex |= 64;
+        if (gridCell.isoValues[7] < this.isoLevel) cubeindex |= 128;
+
+        //cubes is inside/outside surface
+        if (this.edgeTable[cubeindex] == 0)
+            return 0;
+
+        if (this.edgeTable[cubeindex] & 1)
+            vertlist[0] =
+                VertexInterp(gridCell.positions[0],gridCell.positions[1],gridCell.isoValue[0],gridCell.isoValue[1]);
+        if (this.edgeTable[cubeindex] & 2)
+            vertlist[1] =
+                VertexInterp(gridCell.positions[1],gridCell.positions[2],gridCell.isoValue[1],gridCell.isoValue[2]);
+        if (this.edgeTable[cubeindex] & 4)
+            vertlist[2] =
+                VertexInterp(gridCell.positions[2],gridCell.positions[3],gridCell.isoValue[2],gridCell.isoValue[3]);
+        if (this.edgeTable[cubeindex] & 8)
+            vertlist[3] =
+                VertexInterp(gridCell.positions[3],gridCell.positions[0],gridCell.isoValue[3],gridCell.isoValue[0]);
+        if (this.edgeTable[cubeindex] & 16)
+            vertlist[4] =
+                VertexInterp(gridCell.positions[4],gridCell.positions[5],gridCell.isoValue[4],gridCell.isoValue[5]);
+        if (this.edgeTable[cubeindex] & 32)
+            vertlist[5] =
+                VertexInterp(gridCell.positions[5],gridCell.positions[6],gridCell.isoValue[5],gridCell.isoValue[6]);
+        if (this.edgeTable[cubeindex] & 64)
+            vertlist[6] =
+                VertexInterp(gridCell.positions[6],gridCell.positions[7],gridCell.isoValue[6],gridCell.isoValue[7]);
+        if (this.edgeTable[cubeindex] & 128)
+            vertlist[7] =
+                VertexInterp(gridCell.positions[7],gridCell.positions[4],gridCell.isoValue[7],gridCell.isoValue[4]);
+        if (this.edgeTable[cubeindex] & 256)
+            vertlist[8] =
+                VertexInterp(gridCell.positions[0],gridCell.positions[4],gridCell.isoValue[0],gridCell.isoValue[4]);
+        if (this.edgeTable[cubeindex] & 512)
+            vertlist[9] =
+                VertexInterp(gridCell.positions[1],gridCell.positions[5],gridCell.isoValue[1],gridCell.isoValue[5]);
+        if (this.edgeTable[cubeindex] & 1024)
+            vertlist[10] =
+                VertexInterp(gridCell.positions[2],gridCell.positions[6],gridCell.isoValue[2],gridCell.isoValue[6]);
+        if (this.edgeTable[cubeindex] & 2048)
+            vertlist[11] =
+                VertexInterp(gridCell.positions[3],gridCell.positions[7],gridCell.isoValue[3],gridCell.isoValue[7]);
+
+        var triangles = [];
+
+        for (var i = 0; this.triTable[cubeindex][i] != -1; i+=3)
+        {
+            //triangles[ntriang].
+        }
+
+    }
+
+    function VertexInterp(p1, p2, valp1, valp2)
+    {
+        var mu;
+        var p = new THREE.Vector3(0,0,0);
+
+        if ( Math.abs(this.isoLevel - valp1) < 0.00001)
+            return p1;
+        if ( Math.abs(this.isoLevel - valp2) < 0.00001)
+            return p2;
+        if ( Math.abs(valp1 - valp2) < 0.00001)
+            return p1;
+
+        mu = (this.isoLevel - valp1) / (valp2 - valp1);
+
+        p.x = p1.x + mu * (p2.x -p1.x);
+        p.y = p1.y + mu * (p2.y -p1.y);
+        p.z = p1.z + mu * (p2.z -p1.z);
+
+        return p;
+    }
 
     function initCells()
     {
