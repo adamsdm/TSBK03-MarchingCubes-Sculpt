@@ -321,7 +321,7 @@ function MarchingCubes(size, resolution){
         ];
 
         for(var i=0; i<gridCells.length; i++){
-            polygonise(this.gridCells[i]);
+            this.polygonise(this.gridCells[i]);
         }
         
         // DEBUG //
@@ -341,7 +341,7 @@ function MarchingCubes(size, resolution){
         }
     };
 
-    function polygonise(gridCell)
+    this.polygonise = function(gridCell)
     {
         var cubeindex = 0;
         var vertlist = []; //contains xyz positions
