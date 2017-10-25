@@ -320,10 +320,12 @@ function MarchingCubes(size, resolution){
             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
         ];
 
+        var temp = [];
         for(var i=0; i<gridCells.length; i++){
-            polygonise(this.gridCells[i]);
+            temp.push( polygonise(this.gridCells[i]));
         }
-        
+        console.log(temp);
+
         // DEBUG //
         setupBillboards();
 
@@ -400,13 +402,18 @@ function MarchingCubes(size, resolution){
         var triangles = [];
 
         var i=0; 
-        
+        var a,b,c;
+        while (this.triTable[cubeindex][i] != -1)
+        {
+            a = vertlist[this.triTable[cubeindex][i]];
+            b = vertlist[this.triTable[cubeindex][i+1]];
+            c = vertlist[this.triTable[cubeindex][i+2]];
 
-        // for (var i = 0; this.triTable[cubeindex][i] != -1; i+=3)
-        // {
-        //     //triangles[ntriang].
-        // }
-        
+            triangles[ntriang] = new THREE.Triangle(a,b,c);
+
+            i += 3;
+        }
+        return triangles;
     }
 
     function VertexInterp(p1, p2, valp1, valp2)
