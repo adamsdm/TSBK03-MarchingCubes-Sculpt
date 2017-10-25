@@ -2,7 +2,9 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var stats;
 
+
 var camera, controls, scene, renderer;
+var volume;
 
 var pathToShaders = '/src/shaders';
 var pathToChunks  = '/src/chunks';
@@ -14,9 +16,14 @@ shaders.load( 'frag' , 'FRAG'  , 'fragment'    );
 shaders.shaderSetLoaded = function(){
     init();
     animate();
+    displayGUI();
 }
 
-
+// Initial parameter values
+var parameters = {
+    isolation: 20,
+    renderBillboards: true
+}
 
 function init() {
 
@@ -36,15 +43,16 @@ function init() {
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
     // Marching cubes
-    var resolution = 40;
-    var size = 20;
-    var volume = MarchingCubes(size, resolution);
-    volume.scale.set(2,2,2);
-    scene.add( volume );
+    var resolution = 51;
+    var size = 51;
+    volume = MarchingCubes(size, resolution);
+    volume.init();
+    volume.scene = scene;
+    volume.parameters = parameters;
+    scene.add( volume.particles );
 
 
     // lights
-
     var light = new THREE.DirectionalLight( 0xffffff );
     light.position.set( 1, 1, 1 );
     scene.add( light );
@@ -60,6 +68,35 @@ function init() {
     container.appendChild( stats.dom );
 
     window.addEventListener( 'resize', onWindowResize, false );
+
+}
+
+function displayGUI(){
+    var gui = new dat.GUI();
+    var jar;
+
+
+    var simulationFolder = gui.addFolder('Simulation');
+    simulationFolder.open();
+    var isoVal = simulationFolder.add(parameters, 'isolation').min(10.0).max(25).step(0.01).name('Isolation');
+
+    var debugFolder = gui.addFolder('Debug');
+    var debug = debugFolder.add( parameters, 'renderBillboards' ).name('Render billboards');
+    debugFolder.open();
+
+
+    isoVal.onChange(function(jar){ 
+        volume.setISO(jar); 
+    });
+
+    debug.onChange(function(jar){
+        if(jar){
+            scene.add(volume.particles);
+        } else {
+            scene.remove(volume.particles)
+        }
+        volume.parameters = parameters;
+    })
 
 }
 
@@ -79,13 +116,10 @@ function animate() {
     controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 
     stats.update();
-
     render();
 
 }
 
 function render() {
-
     renderer.render( scene, camera );
-
 }
