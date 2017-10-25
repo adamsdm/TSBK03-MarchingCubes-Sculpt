@@ -6525,7 +6525,7 @@ jQuery.extend( {
 			val = cssNormalTransform[ name ];
 		}
 
-		// Make numeric if forced or a qualifier was provided and val looks numeric
+		// Make numeric if forced or a qualifier was provided and isoValue looks numeric
 		if ( extra === "" || extra ) {
 			num = parseFloat( val );
 			return extra === true || isFinite( num ) ? num || 0 : val;
@@ -7925,7 +7925,7 @@ jQuery.fn.extend( {
 var rreturn = /\r/g;
 
 jQuery.fn.extend( {
-	val: function( value ) {
+	isoValue: function(value ) {
 		var hooks, ret, isFunction,
 			elem = this[ 0 ];
 
@@ -7965,7 +7965,7 @@ jQuery.fn.extend( {
 			}
 
 			if ( isFunction ) {
-				val = value.call( this, i, jQuery( this ).val() );
+				val = value.call( this, i, jQuery( this ).isoValue() );
 			} else {
 				val = value;
 			}
@@ -8039,7 +8039,7 @@ jQuery.extend( {
 								!nodeName( option.parentNode, "optgroup" ) ) ) {
 
 						// Get the specific value for the option
-						value = jQuery( option ).val();
+						value = jQuery( option ).isoValue();
 
 						// We don't need an array for one selects
 						if ( one ) {
@@ -8089,7 +8089,7 @@ jQuery.each( [ "radio", "checkbox" ], function() {
 	jQuery.valHooks[ this ] = {
 		set: function( elem, value ) {
 			if ( Array.isArray( value ) ) {
-				return ( elem.checked = jQuery.inArray( jQuery( elem ).val(), value ) > -1 );
+				return ( elem.checked = jQuery.inArray( jQuery( elem ).isoValue(), value ) > -1 );
 			}
 		}
 	};
@@ -8475,7 +8475,7 @@ jQuery.fn.extend( {
 				( this.checked || !rcheckableType.test( type ) );
 		} )
 		.map( function( i, elem ) {
-			var val = jQuery( this ).val();
+			var val = jQuery( this ).isoValue();
 
 			if ( val == null ) {
 				return null;
