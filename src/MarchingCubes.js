@@ -320,10 +320,7 @@ function MarchingCubes(size, resolution){
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ]);
 
-        for (var i = 0; i < this.gridCells.length; i++)
-        {
-            polygonise(this.gridCells[i]);
-        }
+        polygonise(this.gridCells[i]);
         
         // DEBUG //
         setupBillboards();
@@ -363,40 +360,40 @@ function MarchingCubes(size, resolution){
 
         if (this.edgeTable[cubeindex] & 1)
             vertlist[0] =
-                VertexInterp(gridCell.positions[0],gridCell.positions[1],gridCell.isoValue[0],gridCell.isoValue[1]);
+                VertexInterp(gridCell.positions[0],gridCell.positions[1],gridCell.isoValues[0],gridCell.isoValues[1]);
         if (this.edgeTable[cubeindex] & 2)
             vertlist[1] =
-                VertexInterp(gridCell.positions[1],gridCell.positions[2],gridCell.isoValue[1],gridCell.isoValue[2]);
+                VertexInterp(gridCell.positions[1],gridCell.positions[2],gridCell.isoValues[1],gridCell.isoValues[2]);
         if (this.edgeTable[cubeindex] & 4)
             vertlist[2] =
-                VertexInterp(gridCell.positions[2],gridCell.positions[3],gridCell.isoValue[2],gridCell.isoValue[3]);
+                VertexInterp(gridCell.positions[2],gridCell.positions[3],gridCell.isoValues[2],gridCell.isoValues[3]);
         if (this.edgeTable[cubeindex] & 8)
             vertlist[3] =
-                VertexInterp(gridCell.positions[3],gridCell.positions[0],gridCell.isoValue[3],gridCell.isoValue[0]);
+                VertexInterp(gridCell.positions[3],gridCell.positions[0],gridCell.isoValues[3],gridCell.isoValues[0]);
         if (this.edgeTable[cubeindex] & 16)
             vertlist[4] =
-                VertexInterp(gridCell.positions[4],gridCell.positions[5],gridCell.isoValue[4],gridCell.isoValue[5]);
+                VertexInterp(gridCell.positions[4],gridCell.positions[5],gridCell.isoValues[4],gridCell.isoValues[5]);
         if (this.edgeTable[cubeindex] & 32)
             vertlist[5] =
-                VertexInterp(gridCell.positions[5],gridCell.positions[6],gridCell.isoValue[5],gridCell.isoValue[6]);
+                VertexInterp(gridCell.positions[5],gridCell.positions[6],gridCell.isoValues[5],gridCell.isoValues[6]);
         if (this.edgeTable[cubeindex] & 64)
             vertlist[6] =
-                VertexInterp(gridCell.positions[6],gridCell.positions[7],gridCell.isoValue[6],gridCell.isoValue[7]);
+                VertexInterp(gridCell.positions[6],gridCell.positions[7],gridCell.isoValues[6],gridCell.isoValues[7]);
         if (this.edgeTable[cubeindex] & 128)
             vertlist[7] =
-                VertexInterp(gridCell.positions[7],gridCell.positions[4],gridCell.isoValue[7],gridCell.isoValue[4]);
+                VertexInterp(gridCell.positions[7],gridCell.positions[4],gridCell.isoValues[7],gridCell.isoValues[4]);
         if (this.edgeTable[cubeindex] & 256)
             vertlist[8] =
-                VertexInterp(gridCell.positions[0],gridCell.positions[4],gridCell.isoValue[0],gridCell.isoValue[4]);
+                VertexInterp(gridCell.positions[0],gridCell.positions[4],gridCell.isoValues[0],gridCell.isoValues[4]);
         if (this.edgeTable[cubeindex] & 512)
             vertlist[9] =
-                VertexInterp(gridCell.positions[1],gridCell.positions[5],gridCell.isoValue[1],gridCell.isoValue[5]);
+                VertexInterp(gridCell.positions[1],gridCell.positions[5],gridCell.isoValues[1],gridCell.isoValues[5]);
         if (this.edgeTable[cubeindex] & 1024)
             vertlist[10] =
-                VertexInterp(gridCell.positions[2],gridCell.positions[6],gridCell.isoValue[2],gridCell.isoValue[6]);
+                VertexInterp(gridCell.positions[2],gridCell.positions[6],gridCell.isoValues[2],gridCell.isoValues[6]);
         if (this.edgeTable[cubeindex] & 2048)
             vertlist[11] =
-                VertexInterp(gridCell.positions[3],gridCell.positions[7],gridCell.isoValue[3],gridCell.isoValue[7]);
+                VertexInterp(gridCell.positions[3],gridCell.positions[7],gridCell.isoValues[3],gridCell.isoValues[7]);
 
         var triangles = [];
 
