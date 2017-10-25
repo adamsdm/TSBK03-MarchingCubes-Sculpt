@@ -3,6 +3,17 @@ function MarchingCubes(size, resolution){
 
     var context = this;
     
+    this.resolution = resolution || 10;
+    this.size = size || 10;
+    this.dx = this.dy = this.dz = this.size / this.resolution;
+    this.data = intializeData();
+    this.gridCells = initCells();
+    this.geometry = new THREE.Geometry();
+
+    sprite = new THREE.TextureLoader().load( "ball.png" );
+
+    this.material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
+    this.material.color.setHSL( 1.0, 0.3, 0.7 );
 
     this.init = function(){
         this.resolution = resolution || 10;
@@ -10,22 +21,23 @@ function MarchingCubes(size, resolution){
         this.dx = this.dy = this.dz = this.size / this.resolution;
         this.data = intializeData();
     
-        this.isolation = 20;
+        this.isoValue = 20;
         
         // DEBUG //
         setupBillboards()
     }
-    
 
     this.setISO = function(value){
-        this.isolation = value;
+        console.log(this.scene);
+        this.isoValue = value;
         setupBillboards();
+
     }
 
     function setupBillboards(){
-        var geometry = new THREE.Geometry();
-        geometry.verticesNeedsUpdate = true;
-        sprite = new THREE.TextureLoader().load( "ball.png" );
+        this.geometry.dispose();
+        this.geometry = new THREE.Geometry();
+        
 
         for ( i = 0; i < resolution; i ++ ) {
             for ( j = 0; j < resolution; j ++ ) {
@@ -36,17 +48,59 @@ function MarchingCubes(size, resolution){
                     vertex.z = k*dz - (this.size/2);
     
     
-                    if(this.data[i][j][k] < this.isolation)
+                    if(this.data[i][j][k] < this.isoValue)
                         geometry.vertices.push( vertex );
                 }
             }
         }
 
-        var material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
-        material.color.setHSL( 1.0, 0.3, 0.7 );
+        this.scene.remove(this.particles)
         this.particles = new THREE.Points( geometry, material );
+        this.scene.add(this.particles)
     }
 
+    function initCells()
+    {
+        var gridCells = [];
+        for ( i = 0; i < resolution - 1; i ++ ) {
+            for ( j = 0; j < resolution - 1; j ++ ) {
+                for ( k = 0; k < resolution - 1; k ++ ) {
+                    //create a grid cell
+                    //isoValues contains isovalue at each vertex/corner of cube
+                    var isoValues = [];
+                    //bottom verrices of cube
+                    isoValues.push(this.data[i][j][k]);
+                    isoValues.push(this.data[i+1][j][k]);
+                    isoValues.push(this.data[i+1][j][k+1]);
+                    isoValues.push(this.data[i][j][k+1]);
+                    //top verrices of cube
+                    isoValues.push(this.data[i][j+1][k]);
+                    isoValues.push(this.data[i+1][j+1][k]);
+                    isoValues.push(this.data[i+1][j+1][k+1]);
+                    isoValues.push(this.data[i][j+1][k+1]);
+
+                    var positions = [];
+                    positions.push( new THREE.Vector3(i*dx,j*dy,k*dz));
+                    positions.push( new THREE.Vector3((i+1)*dx,j*dy,k*dz));
+                    positions.push( new THREE.Vector3((i+1)*dx,j*dy,(k+1)*dz));
+                    positions.push( new THREE.Vector3(i*dx,j*dy,(k+1)*dz));
+
+                    positions.push( new THREE.Vector3(i*dx,(j+1)*dy,k*dz));
+                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy,k*dz));
+                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy,(k+1)*dz));
+                    positions.push( new THREE.Vector3(i*dx,(j+1)*dy,(k+1)*dz));
+
+                    var gridCell = {
+                        positions: positions,
+                        isoValues: isoValues
+                    };
+
+                    gridCells.push(gridCell);
+                }
+            }
+        }
+        return gridCells;
+    }
 
     function dist(x1, y1, z1, x2, y2, z2){
         return Math.sqrt( Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));

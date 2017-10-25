@@ -42,10 +42,11 @@ function init() {
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
     // Marching cubes
-    var resolution = 26;
+    var resolution = 51;
     var size = 51;
     volume = MarchingCubes(size, resolution);
     volume.init();
+    volume.scene = scene;
     scene.add( volume.particles );
 
 
@@ -75,7 +76,7 @@ function displayGUI(){
 
     var simulationFolder = gui.addFolder('Simulation');
     simulationFolder.open();
-    var isoVal = simulationFolder.add(parameters, 'isolation').min(10.0).max(40).step(0.01).name('Isolation');
+    var isoVal = simulationFolder.add(parameters, 'isolation').min(10.0).max(25).step(0.01).name('Isolation');
 
 
     isoVal.onChange(function(jar){ volume.setISO(jar); })
@@ -98,13 +99,10 @@ function animate() {
     controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 
     stats.update();
-
     render();
 
 }
 
 function render() {
-
     renderer.render( scene, camera );
-
 }
