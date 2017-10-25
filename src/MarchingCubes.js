@@ -1,6 +1,5 @@
 function MarchingCubes(size, resolution){
 
-
     var context = this;
     
     this.resolution = resolution || 10;
@@ -10,13 +9,8 @@ function MarchingCubes(size, resolution){
     this.gridCells = initCells();
     this.isoLevel = 10;
 
-    for (var i = 0; i < this.gridCells.length; i++)
-    {
-        polygonise(this.gridCells[i]);
-    }
-    this.billboardGeometry = new THREE.Geometry();
     
-
+    this.billboardGeometry = new THREE.Geometry();
     var sprite = new THREE.TextureLoader().load( "ball.png" );
 
     this.pointsMaterial = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
@@ -325,9 +319,15 @@ function MarchingCubes(size, resolution){
             0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ]);
+
+        for (var i = 0; i < this.gridCells.length; i++)
+        {
+            polygonise(this.gridCells[i]);
+        }
         
         // DEBUG //
         setupBillboards();
+
 
         // Remove splashscreen when loading is done
         $('#loadscreen').fadeOut();
@@ -347,7 +347,7 @@ function MarchingCubes(size, resolution){
         var cubeindex = 0;
         var vertlist = []; //contains xyz positions
         var ntriang = 0;
-        console.log(this.isoLevel);
+
         if (gridCell.isoValues[0] < this.isoLevel) cubeindex |= 1;
         if (gridCell.isoValues[1] < this.isoLevel) cubeindex |= 2;
         if (gridCell.isoValues[2] < this.isoLevel) cubeindex |= 4;
@@ -357,7 +357,6 @@ function MarchingCubes(size, resolution){
         if (gridCell.isoValues[6] < this.isoLevel) cubeindex |= 64;
         if (gridCell.isoValues[7] < this.isoLevel) cubeindex |= 128;
 
-        console.log(this);
         //cubes is inside/outside surface
         if (this.edgeTable[cubeindex] == 0)
             return 0;
