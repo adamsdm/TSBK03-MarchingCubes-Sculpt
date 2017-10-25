@@ -8,12 +8,12 @@ function MarchingCubes(size, resolution){
     this.dx = this.dy = this.dz = this.size / this.resolution;
     this.data = intializeData();
     this.gridCells = initCells();
-    this.geometry = new THREE.Geometry();
+    this.billboardGeometry = new THREE.Geometry();
 
     sprite = new THREE.TextureLoader().load( "ball.png" );
 
-    this.material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
-    this.material.color.setHSL( 1.0, 0.3, 0.7 );
+    this.pointsMaterial = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
+    this.pointsMaterial.color.setHSL( 1.0, 0.3, 0.7 );
 
     this.init = function(){
         this.resolution = resolution || 10;
@@ -35,8 +35,8 @@ function MarchingCubes(size, resolution){
     }
 
     function setupBillboards(){
-        this.geometry.dispose();
-        this.geometry = new THREE.Geometry();
+        this.billboardGeometry.dispose();
+        this.billboardGeometry = new THREE.Geometry();
         
 
         for ( i = 0; i < resolution; i ++ ) {
@@ -49,13 +49,13 @@ function MarchingCubes(size, resolution){
     
     
                     if(this.data[i][j][k] < this.isoValue)
-                        geometry.vertices.push( vertex );
+                        this.billboardGeometry.vertices.push( vertex );
                 }
             }
         }
 
         this.scene.remove(this.particles)
-        this.particles = new THREE.Points( geometry, material );
+        this.particles = new THREE.Points( this.billboardGeometry, this.pointsMaterial );
         this.scene.add(this.particles)
     }
 
