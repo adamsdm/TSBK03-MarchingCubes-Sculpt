@@ -25,7 +25,11 @@ function MarchingCubes(size, resolution){
         this.isoValue = 20;
         
         // DEBUG //
-        setupBillboards()
+        setupBillboards();
+        
+
+        // Remove splashscreen when loading is done
+        $('#loadscreen').fadeOut();
     }
 
     this.setISO = function(value){
