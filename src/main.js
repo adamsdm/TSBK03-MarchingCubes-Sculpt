@@ -21,7 +21,8 @@ shaders.shaderSetLoaded = function(){
 
 // Initial parameter values
 var parameters = {
-    isolation: 20
+    isolation: 20,
+    renderBillboards: true
 }
 
 function init() {
@@ -47,6 +48,7 @@ function init() {
     volume = MarchingCubes(size, resolution);
     volume.init();
     volume.scene = scene;
+    volume.parameters = parameters;
     scene.add( volume.particles );
 
 
@@ -78,8 +80,23 @@ function displayGUI(){
     simulationFolder.open();
     var isoVal = simulationFolder.add(parameters, 'isolation').min(10.0).max(25).step(0.01).name('Isolation');
 
+    var debugFolder = gui.addFolder('Debug');
+    var debug = debugFolder.add( parameters, 'renderBillboards' ).name('Render billboards');
+    debugFolder.open();
 
-    isoVal.onChange(function(jar){ volume.setISO(jar); })
+
+    isoVal.onChange(function(jar){ 
+        volume.setISO(jar); 
+    });
+
+    debug.onChange(function(jar){
+        if(jar){
+            scene.add(volume.particles);
+        } else {
+            scene.remove(volume.particles)
+        }
+        volume.parameters = parameters;
+    })
 
 }
 

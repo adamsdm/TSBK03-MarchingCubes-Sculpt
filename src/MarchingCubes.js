@@ -9,6 +9,7 @@ function MarchingCubes(size, resolution){
     this.data = intializeData();
     this.gridCells = initCells();
     this.billboardGeometry = new THREE.Geometry();
+    
 
     sprite = new THREE.TextureLoader().load( "ball.png" );
 
@@ -28,9 +29,12 @@ function MarchingCubes(size, resolution){
     }
 
     this.setISO = function(value){
-        console.log(this.scene);
+        
         this.isoValue = value;
-        setupBillboards();
+
+        if(this.parameters.renderBillboards){
+           setupBillboards();
+        }
 
     }
 
