@@ -22,7 +22,8 @@ shaders.shaderSetLoaded = function(){
 // Initial parameter values
 var parameters = {
     isolation: 20,
-    renderBillboards: true
+    renderVertNorms: false,
+    renderBillboards: false
 }
 
 function init() {
@@ -43,13 +44,12 @@ function init() {
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
     // Marching cubes
-    var resolution = 10;
+    var resolution = 20;
     var size = 51;
     volume = MarchingCubes(size, resolution);
     volume.init();
     volume.scene = scene;
     volume.parameters = parameters;
-    scene.add( volume.particles );
 
 
     // lights
@@ -78,25 +78,35 @@ function displayGUI(){
 
     var simulationFolder = gui.addFolder('Simulation');
     simulationFolder.open();
-    var isoVal = simulationFolder.add(parameters, 'isolation').min(10.0).max(25).step(0.01).name('Isolation');
+    var isoVal = simulationFolder.add(parameters, 'isolation').min(10.0).max(40).step(0.01).name('Iso-value');
 
     var debugFolder = gui.addFolder('Debug');
-    var debug = debugFolder.add( parameters, 'renderBillboards' ).name('Render billboards');
     debugFolder.open();
+    var showVertNorms = debugFolder.add( parameters, 'renderVertNorms' ).name('Vert. norms');
+    var showBillboards = debugFolder.add( parameters, 'renderBillboards' ).name('Render billboards');
+    
 
 
     isoVal.onChange(function(jar){ 
         volume.setISO(jar); 
     });
 
-    debug.onChange(function(jar){
+    showVertNorms.onChange(function(jar){
+        if(jar){
+            scene.add(volume.meshVertNormals);
+        } else {
+            scene.remove(volume.meshVertNormals);
+        }
+    });
+
+    showBillboards.onChange(function(jar){
         if(jar){
             scene.add(volume.particles);
         } else {
             scene.remove(volume.particles)
         }
         volume.parameters = parameters;
-    })
+    });
 
 }
 

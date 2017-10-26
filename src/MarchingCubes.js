@@ -9,12 +9,17 @@ function MarchingCubes(size, resolution){
     this.gridCells = initCells();
     this.isoLevel = 10;
 
-    
+    // Billboards
     this.billboardGeometry = new THREE.Geometry();
     var sprite = new THREE.TextureLoader().load( "ball.png" );
-
     this.pointsMaterial = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
     this.pointsMaterial.color.setHSL( 1.0, 0.3, 0.7 );
+
+    // Volume
+    this.geometry = new THREE.Geometry();
+    this.volumeMaterial =  new THREE.MeshLambertMaterial( {color: 0xff0000, side: THREE.DoubleSide} );
+    this.mesh = new THREE.Mesh( this.geometry, this.volumeMaterial );
+
 
     this.init = function(){
         this.resolution = resolution || 10;
@@ -320,12 +325,13 @@ function MarchingCubes(size, resolution){
             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
         ];
 
-        for(var i=0; i<gridCells.length; i++){
-            this.polygonise(this.gridCells[i]);
-        }
-        
+        // Generate mesh
+        this.generateMesh();
+
         // DEBUG //
+        
         setupBillboards();
+        
 
 
         // Remove splashscreen when loading is done
@@ -339,7 +345,35 @@ function MarchingCubes(size, resolution){
         if (this.parameters.renderBillboards) {
             setupBillboards();
         }
+        this.generateMesh();
     };
+
+    this.generateMesh = function(){
+        this.geometry.dispose();
+        this.geometry = new THREE.Geometry();
+        
+        this.vertexIndex = 0; 
+
+        for(var i=0; i<gridCells.length; i++){
+            this.polygonise(this.gridCells[i]);
+        }
+
+        
+        this.geometry.computeFaceNormals();
+        this.geometry.computeVertexNormals();
+
+        
+        this.scene.remove(this.mesh);
+        this.mesh = new THREE.Mesh( this.geometry, this.volumeMaterial );
+
+        
+        this.scene.add(this.mesh);
+        this.meshVertNormals = new THREE.VertexNormalsHelper( this.mesh, 2, 0x00ff00, 1 );
+
+        if(this.parameters.renderVertNorms){
+            this.scene.add(this.meshVertNormals);
+        }
+    }
 
     this.polygonise = function(gridCell)
     {
@@ -400,13 +434,24 @@ function MarchingCubes(size, resolution){
         var triangles = [];
 
         var i=0; 
-        
+        var a,b,c, face;
+        while (this.triTable[cubeindex][i] != -1) {
+            a = vertlist[this.triTable[cubeindex][ i    ]].clone();
+            b = vertlist[this.triTable[cubeindex][ i + 1]].clone();
+            c = vertlist[this.triTable[cubeindex][ i + 2]].clone();
 
-        // for (var i = 0; this.triTable[cubeindex][i] != -1; i+=3)
-        // {
-        //     //triangles[ntriang].
-        // }
-        
+
+            this.geometry.vertices.push( a );
+            this.geometry.vertices.push( b );
+            this.geometry.vertices.push( c );
+
+            face = new THREE.Face3(this.vertexIndex, this.vertexIndex + 1, this.vertexIndex + 2);
+            this.geometry.faces.push( face );
+            geometry.faceVertexUvs[ 0 ].push( [ new THREE.Vector2(0,0), new THREE.Vector2(0,1), new THREE.Vector2(1,1) ] );
+            
+            this.vertexIndex +=3;
+            i += 3;
+        }
     }
 
     function VertexInterp(p1, p2, valp1, valp2)
@@ -452,7 +497,11 @@ function MarchingCubes(size, resolution){
 
         this.scene.remove(this.particles)
         this.particles = new THREE.Points( this.billboardGeometry, this.pointsMaterial );
-        this.scene.add(this.particles)
+        
+        if (this.parameters.renderBillboards) {
+            this.scene.add(this.particles)
+        }
+        
     }
 
     function initCells()
@@ -465,26 +514,26 @@ function MarchingCubes(size, resolution){
                     //isoValues contains isovalue at each vertex/corner of cube
                     var isoValues = [];
                     //bottom verrices of cube
-                    isoValues.push(this.data[i][j][k]);
-                    isoValues.push(this.data[i+1][j][k]);
-                    isoValues.push(this.data[i+1][j][k+1]);
-                    isoValues.push(this.data[i][j][k+1]);
+                    isoValues.push(this.data[i  ][j  ][k  ]);
+                    isoValues.push(this.data[i+1][j  ][k  ]);
+                    isoValues.push(this.data[i+1][j  ][k+1]);
+                    isoValues.push(this.data[i  ][j  ][k+1]);
                     //top verrices of cube
-                    isoValues.push(this.data[i][j+1][k]);
-                    isoValues.push(this.data[i+1][j+1][k]);
+                    isoValues.push(this.data[i  ][j+1][k  ]);
+                    isoValues.push(this.data[i+1][j+1][k  ]);
                     isoValues.push(this.data[i+1][j+1][k+1]);
-                    isoValues.push(this.data[i][j+1][k+1]);
+                    isoValues.push(this.data[i  ][j+1][k+1]);
 
                     var positions = [];
-                    positions.push( new THREE.Vector3(i*dx,j*dy,k*dz));
-                    positions.push( new THREE.Vector3((i+1)*dx,j*dy,k*dz));
-                    positions.push( new THREE.Vector3((i+1)*dx,j*dy,(k+1)*dz));
-                    positions.push( new THREE.Vector3(i*dx,j*dy,(k+1)*dz));
+                    positions.push( new THREE.Vector3( i   *dx, j   *dy, k     * dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)*dx, j   *dy, k     * dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)*dx, j   *dy, (k+1) * dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3( i   *dx, j   *dy, (k+1) * dz).subScalar(this.size/2));
 
-                    positions.push( new THREE.Vector3(i*dx,(j+1)*dy,k*dz));
-                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy,k*dz));
-                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy,(k+1)*dz));
-                    positions.push( new THREE.Vector3(i*dx,(j+1)*dy,(k+1)*dz));
+                    positions.push( new THREE.Vector3( i   *dx,(j+1)*dy, k     *dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy, k     *dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy, (k+1) *dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3(i    *dx,(j+1)*dy, (k+1) *dz).subScalar(this.size/2));
 
                     var gridCell = {
                         positions: positions,
