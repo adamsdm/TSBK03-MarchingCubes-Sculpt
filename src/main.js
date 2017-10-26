@@ -4,7 +4,7 @@ var stats;
 
 
 var camera, controls, scene, renderer;
-var volume;
+var volume, raycaster, mouse;
 
 var pathToShaders = '/src/shaders';
 var pathToChunks  = '/src/chunks';
@@ -53,6 +53,14 @@ function init() {
     volume.scene = scene;
     volume.parameters = parameters;
 
+    // Raycasting
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+    var helperGeometry = new THREE.CylinderGeometry( 0, 4, 8, 3 );
+    //helperGeometry.translate( 0, 50, 0 );
+    helperGeometry.rotateX( Math.PI / 2 );
+    helper = new THREE.Mesh( helperGeometry, new THREE.MeshNormalMaterial() );
+    scene.add( helper );
 
     // lights
     var light = new THREE.DirectionalLight( 0xffffff );
@@ -70,6 +78,7 @@ function init() {
     container.appendChild( stats.dom );
 
     window.addEventListener( 'resize', onWindowResize, false );
+    container.addEventListener( 'mousemove', onMouseMove, false );
 
 }
 
@@ -148,4 +157,27 @@ function animate() {
 
 function render() {
     renderer.render( scene, camera );
+}
+
+
+function onMouseMove( event ) {    
+
+    mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+
+    raycaster.setFromCamera( mouse, camera );
+    // See if the ray from the camera into the world hits one of our meshes
+    var intersects = raycaster.intersectObject( mesh );
+    // Toggle rotation bool for meshes that we clicked
+    if ( intersects.length > 0 ) {
+
+        
+        helper.position.set( 0, 0, 0 );
+        helper.lookAt( intersects[ 0 ].face.normal );
+        helper.position.copy( intersects[ 0 ].point );
+        
+
+        console.log(intersects[0].point);
+
+    }
 }

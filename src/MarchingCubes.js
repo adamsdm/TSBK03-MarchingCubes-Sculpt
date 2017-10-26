@@ -361,7 +361,8 @@ function MarchingCubes(size, resolution){
         
         this.geometry.computeFaceNormals();
         this.geometry.computeVertexNormals();
-        
+        this.geometry.computeBoundingSphere();
+
         this.scene.remove(this.mesh);
         this.mesh = new THREE.Mesh( this.geometry, this.volumeMaterial );
         this.scene.add(this.mesh);
@@ -466,14 +467,15 @@ function MarchingCubes(size, resolution){
     {
         var mu;
         var p = new THREE.Vector3(0,0,0);
-
+        
         if ( Math.abs(this.isoValue - valp1) < 0.00001)
             return p1;
         if ( Math.abs(this.isoValue - valp2) < 0.00001)
             return p2;
         if ( Math.abs(valp1 - valp2) < 0.00001)
             return p1;
-
+        
+        
         mu = (this.isoValue - valp1) / (valp2 - valp1);
 
         p.x = p1.x + mu * (p2.x -p1.x);
