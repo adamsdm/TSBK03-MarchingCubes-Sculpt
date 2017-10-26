@@ -23,6 +23,8 @@ shaders.shaderSetLoaded = function(){
 var parameters = {
     isolation: 20,
     renderVertNorms: false,
+    renderFaceNorms: false,
+    wireframe: false,
     renderBillboards: false
 }
 
@@ -83,6 +85,8 @@ function displayGUI(){
     var debugFolder = gui.addFolder('Debug');
     debugFolder.open();
     var showVertNorms = debugFolder.add( parameters, 'renderVertNorms' ).name('Vert. norms');
+    var showFaceNorms = debugFolder.add( parameters, 'renderFaceNorms' ).name('Face. norms');
+    var wireframe = debugFolder.add( parameters, 'wireframe' ).name('Wireframe');
     var showBillboards = debugFolder.add( parameters, 'renderBillboards' ).name('Render billboards');
     
 
@@ -98,6 +102,18 @@ function displayGUI(){
             scene.remove(volume.meshVertNormals);
         }
     });
+
+    showFaceNorms.onChange(function(jar){
+        if(jar){
+            scene.add(volume.meshFaceNormals);
+        } else {
+            scene.remove(volume.meshFaceNormals);
+        }
+    });
+
+    wireframe.onChange(function(jar){
+        volume.volumeMaterial.wireframe = jar;
+    })
 
     showBillboards.onChange(function(jar){
         if(jar){

@@ -364,15 +364,23 @@ function MarchingCubes(size, resolution){
         
         this.scene.remove(this.mesh);
         this.mesh = new THREE.Mesh( this.geometry, this.volumeMaterial );
-
-        
         this.scene.add(this.mesh);
+
+
         this.scene.remove(this.meshVertNormals);
         this.meshVertNormals = new THREE.VertexNormalsHelper( this.mesh, 2, 0x00ff00, 1 );
+
+        this.scene.remove(this.meshFaceNormals);
+        this.meshFaceNormals = new THREE.FaceNormalsHelper( this.mesh, 2, 0x0000ff, 1 );
 
         if(this.parameters.renderVertNorms){
             this.scene.add(this.meshVertNormals);
         }
+
+        if(this.parameters.renderFaceNorms){
+            this.scene.add(this.meshFaceNormals);
+        }
+
     }
 
     this.polygonise = function(gridCell)
