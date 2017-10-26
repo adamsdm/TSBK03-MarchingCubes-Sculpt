@@ -7,7 +7,7 @@ function MarchingCubes(size, resolution){
     this.dx = this.dy = this.dz = this.size / this.resolution;
     this.data = intializeData();
     this.gridCells = initCells();
-    this.isoLevel = 10;
+    this.isoValue = 10;
 
     // Billboards
     this.billboardGeometry = new THREE.Geometry();
@@ -361,13 +361,13 @@ function MarchingCubes(size, resolution){
         
         this.geometry.computeFaceNormals();
         this.geometry.computeVertexNormals();
-
         
         this.scene.remove(this.mesh);
         this.mesh = new THREE.Mesh( this.geometry, this.volumeMaterial );
 
         
         this.scene.add(this.mesh);
+        this.scene.remove(this.meshVertNormals);
         this.meshVertNormals = new THREE.VertexNormalsHelper( this.mesh, 2, 0x00ff00, 1 );
 
         if(this.parameters.renderVertNorms){
@@ -381,14 +381,14 @@ function MarchingCubes(size, resolution){
         var vertlist = []; //contains xyz positions
         var ntriang = 0;
 
-        if (gridCell.isoValues[0] < this.isoLevel) cubeindex |= 1;
-        if (gridCell.isoValues[1] < this.isoLevel) cubeindex |= 2;
-        if (gridCell.isoValues[2] < this.isoLevel) cubeindex |= 4;
-        if (gridCell.isoValues[3] < this.isoLevel) cubeindex |= 8;
-        if (gridCell.isoValues[4] < this.isoLevel) cubeindex |= 16;
-        if (gridCell.isoValues[5] < this.isoLevel) cubeindex |= 32;
-        if (gridCell.isoValues[6] < this.isoLevel) cubeindex |= 64;
-        if (gridCell.isoValues[7] < this.isoLevel) cubeindex |= 128;
+        if (gridCell.isoValues[0] < this.isoValue) cubeindex |= 1;
+        if (gridCell.isoValues[1] < this.isoValue) cubeindex |= 2;
+        if (gridCell.isoValues[2] < this.isoValue) cubeindex |= 4;
+        if (gridCell.isoValues[3] < this.isoValue) cubeindex |= 8;
+        if (gridCell.isoValues[4] < this.isoValue) cubeindex |= 16;
+        if (gridCell.isoValues[5] < this.isoValue) cubeindex |= 32;
+        if (gridCell.isoValues[6] < this.isoValue) cubeindex |= 64;
+        if (gridCell.isoValues[7] < this.isoValue) cubeindex |= 128;
 
         //cubes is inside/outside surface
         if (this.edgeTable[cubeindex] == 0)
@@ -459,14 +459,14 @@ function MarchingCubes(size, resolution){
         var mu;
         var p = new THREE.Vector3(0,0,0);
 
-        if ( Math.abs(this.isoLevel - valp1) < 0.00001)
+        if ( Math.abs(this.isoValue - valp1) < 0.00001)
             return p1;
-        if ( Math.abs(this.isoLevel - valp2) < 0.00001)
+        if ( Math.abs(this.isoValue - valp2) < 0.00001)
             return p2;
         if ( Math.abs(valp1 - valp2) < 0.00001)
             return p1;
 
-        mu = (this.isoLevel - valp1) / (valp2 - valp1);
+        mu = (this.isoValue - valp1) / (valp2 - valp1);
 
         p.x = p1.x + mu * (p2.x -p1.x);
         p.y = p1.y + mu * (p2.y -p1.y);
