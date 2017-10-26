@@ -56,8 +56,8 @@ function init() {
     // Raycasting
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
-    var helperGeometry = new THREE.CylinderGeometry( 0, 4, 8, 3 );
-    //helperGeometry.translate( 0, 50, 0 );
+    var helperGeometry = new THREE.CylinderGeometry( 0, 2, 4, 3 );
+    helperGeometry.translate( 0, 2, 0 );
     helperGeometry.rotateX( Math.PI / 2 );
     helper = new THREE.Mesh( helperGeometry, new THREE.MeshNormalMaterial() );
     scene.add( helper );
@@ -170,14 +170,10 @@ function onMouseMove( event ) {
     var intersects = raycaster.intersectObject( mesh );
     // Toggle rotation bool for meshes that we clicked
     if ( intersects.length > 0 ) {
-
-        
+   
         helper.position.set( 0, 0, 0 );
         helper.lookAt( intersects[ 0 ].face.normal );
-        helper.position.copy( intersects[ 0 ].point );
-        
-
-        console.log(intersects[0].point);
+        helper.position.copy( intersects[ 0 ].point );    
 
     }
 }

@@ -580,7 +580,4 @@ function MarchingCubes(size, resolution){
     
     return context;
 
-    
-
-
 }
