@@ -566,13 +566,13 @@ function MarchingCubes(size, resolution){
                 data[i][j] = new Array();
 
                 for(var k=0; k < this.resolution; k++){
-                    var pos = new THREE.Vector3(i*dx, j*dy, k*dz);
+                    var pos = new THREE.Vector3(i * this.dx, j * this.dy, k * this.dz);
                     data[i][j][k] = Math.abs(dist(pos.x, pos.y, pos.z, size/2, size/2, size/2));
                 }   
             }
         }
         return data;
-    };
+    }
     
     return context;
 
