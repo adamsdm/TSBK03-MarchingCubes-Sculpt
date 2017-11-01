@@ -46,7 +46,7 @@ function init() {
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
     // Marching cubes
-    var resolution = 50;
+    var resolution = 70;
     var size = 141;
     volume = MarchingCubes(size, resolution);
     volume.init();
@@ -56,10 +56,11 @@ function init() {
     // Raycasting
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
-    var helperGeometry = new THREE.CylinderGeometry( 0, 2, 4, 3 );
-    helperGeometry.translate( 0, 2, 0 );
+    //var helperGeometry = new THREE.CylinderGeometry( 0, 2, 4, 3 );
+    var helperGeometry = new THREE.SphereGeometry( 6, 16, 16);
+    helperGeometry.translate( 0, 0, 0 );
     helperGeometry.rotateX( Math.PI / 2 );
-    helper = new THREE.Mesh( helperGeometry, new THREE.MeshNormalMaterial() );
+    helper = new THREE.Mesh( helperGeometry, new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.7,color: 0xffffff} ) );
     scene.add( helper );
 
     // lights

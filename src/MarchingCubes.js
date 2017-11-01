@@ -333,7 +333,6 @@ function MarchingCubes(size, resolution){
         setupBillboards();
         
 
-
         // Remove splashscreen when loading is done
         $('#loadscreen').fadeOut();
     };
@@ -354,7 +353,7 @@ function MarchingCubes(size, resolution){
         
         this.vertexIndex = 0; 
 
-        for(var i=0; i<gridCells.length; i++){
+        for(var i=0; i < this.gridCells.length; i++){
             this.polygonise(this.gridCells[i]);
         }
 
@@ -382,13 +381,12 @@ function MarchingCubes(size, resolution){
             this.scene.add(this.meshFaceNormals);
         }
 
-    }
+    };
 
     this.polygonise = function(gridCell)
     {
         var cubeindex = 0;
         var vertlist = []; //contains xyz positions
-        var ntriang = 0;
 
         if (gridCell.isoValues[0] < this.isoValue) cubeindex |= 1;
         if (gridCell.isoValues[1] < this.isoValue) cubeindex |= 2;
@@ -440,28 +438,56 @@ function MarchingCubes(size, resolution){
             vertlist[11] =
                 VertexInterp(gridCell.positions[3],gridCell.positions[7],gridCell.isoValues[3],gridCell.isoValues[7]);
 
-        var triangles = [];
 
         var i=0; 
         var a,b,c, face;
+        var indA, indB, indC;
+        var epsilon = 0.1;
         while (this.triTable[cubeindex][i] != -1) {
+            indA = indB = indC = -1;
+
             a = vertlist[this.triTable[cubeindex][ i    ]].clone();
             b = vertlist[this.triTable[cubeindex][ i + 1]].clone();
             c = vertlist[this.triTable[cubeindex][ i + 2]].clone();
 
+            for(var j=0; j<this.geometry.vertices.length; j++){
+                var currVert = this.geometry.vertices[j];
+                
+                if(a.distanceTo(currVert) < epsilon){
+                    indA = j;
+                }
+                if(b.distanceTo(currVert) < epsilon){
+                    indB = j;
+                }
+                if(c.distanceTo(currVert) < epsilon){
+                    indC = j;
+                }
 
-            this.geometry.vertices.push( a );
-            this.geometry.vertices.push( b );
-            this.geometry.vertices.push( c );
+            }
 
-            face = new THREE.Face3(this.vertexIndex, this.vertexIndex + 1, this.vertexIndex + 2);
+            // Vertice not already in list
+            if(indA == -1){
+                this.geometry.vertices.push( a );
+                indA = this.vertexIndex;
+                this.vertexIndex++;
+            }
+            if(indB == -1){
+                this.geometry.vertices.push( b );
+                indB = this.vertexIndex;
+                this.vertexIndex++;
+            }
+            if(indC == -1){
+                this.geometry.vertices.push( c );
+                indC = this.vertexIndex;
+                this.vertexIndex++;
+            }
+
+            face = new THREE.Face3(indA, indB, indC);
             this.geometry.faces.push( face );
-            geometry.faceVertexUvs[ 0 ].push( [ new THREE.Vector2(0,0), new THREE.Vector2(0,1), new THREE.Vector2(1,1) ] );
-            
-            this.vertexIndex +=3;
+            this.geometry.faceVertexUvs[ 0 ].push( [ new THREE.Vector2(0,0), new THREE.Vector2(0,1), new THREE.Vector2(1,1) ] );
             i += 3;
         }
-    }
+    };
 
     function VertexInterp(p1, p2, valp1, valp2)
     {
@@ -474,8 +500,7 @@ function MarchingCubes(size, resolution){
             return p2;
         if ( Math.abs(valp1 - valp2) < 0.00001)
             return p1;
-        
-        
+
         mu = (this.isoValue - valp1) / (valp2 - valp1);
 
         p.x = p1.x + mu * (p2.x -p1.x);
@@ -490,9 +515,9 @@ function MarchingCubes(size, resolution){
         this.billboardGeometry = new THREE.Geometry();
         
 
-        for ( i = 0; i < resolution; i ++ ) {
-            for ( j = 0; j < resolution; j ++ ) {
-                for ( k = 0; k < resolution; k ++ ) {
+        for ( var i = 0; i < resolution; i ++ ) {
+            for ( var j = 0; j < resolution; j ++ ) {
+                for ( var k = 0; k < resolution; k ++ ) {
                     var vertex = new THREE.Vector3();
                     vertex.x = i*dx - (this.size/2);
                     vertex.y = j*dy - (this.size/2);
@@ -505,7 +530,7 @@ function MarchingCubes(size, resolution){
             }
         }
 
-        this.scene.remove(this.particles)
+        this.scene.remove(this.particles);
         this.particles = new THREE.Points( this.billboardGeometry, this.pointsMaterial );
         
         if (this.parameters.renderBillboards) {
@@ -517,9 +542,9 @@ function MarchingCubes(size, resolution){
     function initCells()
     {
         var gridCells = [];
-        for ( i = 0; i < resolution - 1; i ++ ) {
-            for ( j = 0; j < resolution - 1; j ++ ) {
-                for ( k = 0; k < resolution - 1; k ++ ) {
+        for ( var i = 0; i < resolution - 1; i ++ ) {
+            for ( var j = 0; j < resolution - 1; j ++ ) {
+                for ( var k = 0; k < resolution - 1; k ++ ) {
                     //create a grid cell
                     //isoValues contains isovalue at each vertex/corner of cube
                     var isoValues = [];
@@ -535,15 +560,15 @@ function MarchingCubes(size, resolution){
                     isoValues.push(this.data[i  ][j+1][k+1]);
 
                     var positions = [];
-                    positions.push( new THREE.Vector3( i   *dx, j   *dy, k     * dz).subScalar(this.size/2));
-                    positions.push( new THREE.Vector3((i+1)*dx, j   *dy, k     * dz).subScalar(this.size/2));
-                    positions.push( new THREE.Vector3((i+1)*dx, j   *dy, (k+1) * dz).subScalar(this.size/2));
-                    positions.push( new THREE.Vector3( i   *dx, j   *dy, (k+1) * dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3( i   * this.dx, j   * this.dy, k     * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)* this.dx, j   * this.dy, k     * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)* this.dx, j   * this.dy, (k+1) * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3( i   * this.dx, j   * this.dy, (k+1) * this.dz).subScalar(this.size/2));
 
-                    positions.push( new THREE.Vector3( i   *dx,(j+1)*dy, k     *dz).subScalar(this.size/2));
-                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy, k     *dz).subScalar(this.size/2));
-                    positions.push( new THREE.Vector3((i+1)*dx,(j+1)*dy, (k+1) *dz).subScalar(this.size/2));
-                    positions.push( new THREE.Vector3(i    *dx,(j+1)*dy, (k+1) *dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3( i   * this.dx,(j+1)* this.dy, k     * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)* this.dx,(j+1)* this.dy, k     * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)* this.dx,(j+1)* this.dy, (k+1) * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3(i    * this.dx,(j+1)* this.dy, (k+1) * this.dz).subScalar(this.size/2));
 
                     var gridCell = {
                         positions: positions,
@@ -570,7 +595,7 @@ function MarchingCubes(size, resolution){
                 data[i][j] = new Array();
 
                 for(var k=0; k < this.resolution; k++){
-                    var pos = new THREE.Vector3(i*dx, j*dy, k*dz);
+                    var pos = new THREE.Vector3(i * this.dx, j * this.dy, k * this.dz);
                     data[i][j][k] = Math.abs(dist(pos.x, pos.y, pos.z, size/2, size/2, size/2));
                 }   
             }
