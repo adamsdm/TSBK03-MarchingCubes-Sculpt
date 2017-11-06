@@ -360,7 +360,7 @@ function MarchingCubes(size, resolution){
         }
 
         
-        // this.geometry.computeFaceNormals();
+         this.geometry.computeFaceNormals();
         // this.geometry.computeVertexNormals();
         this.geometry.computeBoundingSphere();
 
