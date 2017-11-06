@@ -17,7 +17,7 @@ function MarchingCubes(size, resolution){
 
     // Volume
     this.geometry = new THREE.Geometry();
-    this.volumeMaterial =  new THREE.MeshLambertMaterial( {color: 0xff0000, side: THREE.DoubleSide} );
+    this.volumeMaterial =  new THREE.MeshLambertMaterial( {color: 0x00ff00, side: THREE.DoubleSide} );
     this.mesh = new THREE.Mesh( this.geometry, this.volumeMaterial );
 
 
@@ -584,7 +584,7 @@ function MarchingCubes(size, resolution){
                     noiseSum += amplitude / 2 * noise.simplex3(freq * 2.07 * pos.x, freq * 2.07* pos.y, freq* 2.07 * pos.z);
                     noiseSum += amplitude / 4 * noise.simplex3(freq * 3.93 * pos.x, freq * 3.93* pos.y, freq* 3.93 * pos.z);
                     */
-                    data[i][j][k] =  -13.0 + ( noiseSum);
+                    data[i][j][k] =  -15.0 + ( noiseSum);
                 }
             }
         }
