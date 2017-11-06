@@ -5,7 +5,7 @@ function MarchingCubes(size, resolution){
     this.resolution = resolution || 10;
     this.size = size || 10;
     this.dx = this.dy = this.dz = this.size / this.resolution;
-    this.data = intializeData();
+    intializeData();
     this.gridCells = initCells();
     this.isoValue = 10;
 
@@ -25,7 +25,7 @@ function MarchingCubes(size, resolution){
         this.resolution = resolution || 10;
         this.size = size || 10;
         this.dx = this.dy = this.dz = this.size / this.resolution;
-        this.data = intializeData();
+        
     
         this.isoValue = 0;
 
@@ -353,13 +353,15 @@ function MarchingCubes(size, resolution){
         
         this.vertexIndex = 0; 
 
+        console.log(this.gridCells[200]);
+
         for(var i=0; i < this.gridCells.length; i++){
             this.polygonise(this.gridCells[i]);
         }
 
         
-        this.geometry.computeFaceNormals();
-        this.geometry.computeVertexNormals();
+        // this.geometry.computeFaceNormals();
+        // this.geometry.computeVertexNormals();
         this.geometry.computeBoundingSphere();
 
         this.scene.remove(this.mesh);
@@ -387,6 +389,7 @@ function MarchingCubes(size, resolution){
     {
         var cubeindex = 0;
         var vertlist = []; //contains xyz positions
+        var vertNormalList = [];
 
         if (gridCell.isoValues[0] < this.isoValue) cubeindex |= 1;
         if (gridCell.isoValues[1] < this.isoValue) cubeindex |= 2;
@@ -402,49 +405,71 @@ function MarchingCubes(size, resolution){
             return 0;
 
         if (this.edgeTable[cubeindex] & 1)
-            vertlist[0] =
-                VertexInterp(gridCell.positions[0],gridCell.positions[1],gridCell.isoValues[0],gridCell.isoValues[1]);
+            vertlist[0] = VertexInterp(gridCell.positions[0],gridCell.positions[1],gridCell.isoValues[0],gridCell.isoValues[1]);
+            vertNormalList[0] = VertexInterp(gridCell.gradients[0],gridCell.gradients[1],gridCell.isoValues[0],gridCell.isoValues[1]);
+
         if (this.edgeTable[cubeindex] & 2)
-            vertlist[1] =
-                VertexInterp(gridCell.positions[1],gridCell.positions[2],gridCell.isoValues[1],gridCell.isoValues[2]);
+            vertlist[1] = VertexInterp(gridCell.positions[1],gridCell.positions[2],gridCell.isoValues[1],gridCell.isoValues[2]);
+            vertNormalList[1] = VertexInterp(gridCell.gradients[1],gridCell.gradients[2],gridCell.isoValues[1],gridCell.isoValues[2]);
+
         if (this.edgeTable[cubeindex] & 4)
-            vertlist[2] =
-                VertexInterp(gridCell.positions[2],gridCell.positions[3],gridCell.isoValues[2],gridCell.isoValues[3]);
+            vertlist[2] = VertexInterp(gridCell.positions[2],gridCell.positions[3],gridCell.isoValues[2],gridCell.isoValues[3]);
+            vertNormalList[2] = VertexInterp(gridCell.gradients[2],gridCell.gradients[3],gridCell.isoValues[2],gridCell.isoValues[3]);
+
         if (this.edgeTable[cubeindex] & 8)
-            vertlist[3] =
-                VertexInterp(gridCell.positions[3],gridCell.positions[0],gridCell.isoValues[3],gridCell.isoValues[0]);
+            vertlist[3] = VertexInterp(gridCell.positions[3],gridCell.positions[0],gridCell.isoValues[3],gridCell.isoValues[0]);
+            vertNormalList[3] = VertexInterp(gridCell.gradients[3],gridCell.gradients[0],gridCell.isoValues[3],gridCell.isoValues[0]);
+
         if (this.edgeTable[cubeindex] & 16)
-            vertlist[4] =
-                VertexInterp(gridCell.positions[4],gridCell.positions[5],gridCell.isoValues[4],gridCell.isoValues[5]);
+            vertlist[4] = VertexInterp(gridCell.positions[4],gridCell.positions[5],gridCell.isoValues[4],gridCell.isoValues[5]);
+            vertNormalList[4] = VertexInterp(gridCell.gradients[4],gridCell.gradients[5],gridCell.isoValues[4],gridCell.isoValues[5]);
+
         if (this.edgeTable[cubeindex] & 32)
-            vertlist[5] =
-                VertexInterp(gridCell.positions[5],gridCell.positions[6],gridCell.isoValues[5],gridCell.isoValues[6]);
+            vertlist[5] = VertexInterp(gridCell.positions[5],gridCell.positions[6],gridCell.isoValues[5],gridCell.isoValues[6]);
+            vertNormalList[5] = VertexInterp(gridCell.gradients[5],gridCell.gradients[6],gridCell.isoValues[5],gridCell.isoValues[6]);
+
         if (this.edgeTable[cubeindex] & 64)
-            vertlist[6] =
-                VertexInterp(gridCell.positions[6],gridCell.positions[7],gridCell.isoValues[6],gridCell.isoValues[7]);
+            vertlist[6] = VertexInterp(gridCell.positions[6],gridCell.positions[7],gridCell.isoValues[6],gridCell.isoValues[7]);
+            vertNormalList[6] = VertexInterp(gridCell.gradients[6],gridCell.gradients[7],gridCell.isoValues[6],gridCell.isoValues[7]);
+
         if (this.edgeTable[cubeindex] & 128)
-            vertlist[7] =
-                VertexInterp(gridCell.positions[7],gridCell.positions[4],gridCell.isoValues[7],gridCell.isoValues[4]);
+            vertlist[7] = VertexInterp(gridCell.positions[7],gridCell.positions[4],gridCell.isoValues[7],gridCell.isoValues[4]);
+            vertNormalList[7] = VertexInterp(gridCell.gradients[7],gridCell.gradients[4],gridCell.isoValues[7],gridCell.isoValues[4]);
+
         if (this.edgeTable[cubeindex] & 256)
-            vertlist[8] =
-                VertexInterp(gridCell.positions[0],gridCell.positions[4],gridCell.isoValues[0],gridCell.isoValues[4]);
+            vertlist[8] = VertexInterp(gridCell.positions[0],gridCell.positions[4],gridCell.isoValues[0],gridCell.isoValues[4]);
+            vertNormalList[8] = VertexInterp(gridCell.gradients[0],gridCell.gradients[4],gridCell.isoValues[0],gridCell.isoValues[4]);
+
         if (this.edgeTable[cubeindex] & 512)
-            vertlist[9] =
-                VertexInterp(gridCell.positions[1],gridCell.positions[5],gridCell.isoValues[1],gridCell.isoValues[5]);
+            vertlist[9] = VertexInterp(gridCell.positions[1],gridCell.positions[5],gridCell.isoValues[1],gridCell.isoValues[5]);
+            vertNormalList[9] = VertexInterp(gridCell.gradients[1],gridCell.gradients[5],gridCell.isoValues[1],gridCell.isoValues[5]);
+
         if (this.edgeTable[cubeindex] & 1024)
-            vertlist[10] =
-                VertexInterp(gridCell.positions[2],gridCell.positions[6],gridCell.isoValues[2],gridCell.isoValues[6]);
+            vertlist[10] = VertexInterp(gridCell.positions[2],gridCell.positions[6],gridCell.isoValues[2],gridCell.isoValues[6]);
+            vertNormalList[10] = VertexInterp(gridCell.gradients[2],gridCell.gradients[6],gridCell.isoValues[2],gridCell.isoValues[6]);
+
         if (this.edgeTable[cubeindex] & 2048)
-            vertlist[11] =
-                VertexInterp(gridCell.positions[3],gridCell.positions[7],gridCell.isoValues[3],gridCell.isoValues[7]);
+            vertlist[11] = VertexInterp(gridCell.positions[3],gridCell.positions[7],gridCell.isoValues[3],gridCell.isoValues[7]);
+            vertNormalList[11] = VertexInterp(gridCell.gradients[3],gridCell.gradients[7],gridCell.isoValues[3],gridCell.isoValues[7]);;
+
 
 
         var i=0; 
         var a,b,c, face;
+        var aNorm, bNorm, cNorm;
         while (this.triTable[cubeindex][i] != -1) {
             a = vertlist[this.triTable[cubeindex][ i    ]].clone();
             b = vertlist[this.triTable[cubeindex][ i + 1]].clone();
             c = vertlist[this.triTable[cubeindex][ i + 2]].clone();
+
+            try{
+                aNorm = vertNormalList[this.triTable[cubeindex][ i    ]].clone();
+                bNorm = vertNormalList[this.triTable[cubeindex][ i + 1]].clone();
+                cNorm = vertNormalList[this.triTable[cubeindex][ i + 2]].clone();
+            } catch(e){
+                this.triTable[cubeindex][ i    ]
+                break;
+            }
 
 
             this.geometry.vertices.push( a );
@@ -452,12 +477,18 @@ function MarchingCubes(size, resolution){
             this.geometry.vertices.push( c );
 
             face = new THREE.Face3(this.vertexIndex, this.vertexIndex + 1, this.vertexIndex + 2);
+            face.vertexNormals[0] = aNorm;
+            face.vertexNormals[1] = bNorm;
+            face.vertexNormals[2] = cNorm;
+
             this.geometry.faces.push( face );
             this.geometry.faceVertexUvs[ 0 ].push( [ new THREE.Vector2(0,0), new THREE.Vector2(0,1), new THREE.Vector2(1,1) ] );
             
             this.vertexIndex +=3;
             i += 3;
         }
+
+    
     };
 
     function VertexInterp(p1, p2, valp1, valp2)
@@ -513,22 +544,26 @@ function MarchingCubes(size, resolution){
     function initCells()
     {
         var gridCells = [];
-        for ( var i = 0; i < resolution - 1; i ++ ) {
-            for ( var j = 0; j < resolution - 1; j ++ ) {
-                for ( var k = 0; k < resolution - 1; k ++ ) {
+        for ( var i = 0; i < this.resolution - 1; i ++ ) {
+            for ( var j = 0; j < this.resolution - 1; j ++ ) {
+                for ( var k = 0; k < this.resolution - 1; k ++ ) {
+                    var isoValues = [];
+                    var gradients = [];
                     //create a grid cell
                     //isoValues contains isovalue at each vertex/corner of cube
-                    var isoValues = [];
+                    
                     //bottom verrices of cube
-                    isoValues.push(this.data[i  ][j  ][k  ]);
-                    isoValues.push(this.data[i+1][j  ][k  ]);
-                    isoValues.push(this.data[i+1][j  ][k+1]);
-                    isoValues.push(this.data[i  ][j  ][k+1]);
+                    isoValues.push(this.data[i  ][j  ][k  ]);   gradients.push(this.gradients[i  ][j  ][k  ]); 
+                    isoValues.push(this.data[i+1][j  ][k  ]);   gradients.push(this.gradients[i+1][j  ][k  ]); 
+                    isoValues.push(this.data[i+1][j  ][k+1]);   gradients.push(this.gradients[i+1][j  ][k+1]); 
+                    isoValues.push(this.data[i  ][j  ][k+1]);   gradients.push(this.gradients[i  ][j  ][k+1]); 
+                    
                     //top verrices of cube
-                    isoValues.push(this.data[i  ][j+1][k  ]);
-                    isoValues.push(this.data[i+1][j+1][k  ]);
-                    isoValues.push(this.data[i+1][j+1][k+1]);
-                    isoValues.push(this.data[i  ][j+1][k+1]);
+                    isoValues.push(this.data[i  ][j+1][k  ]);   gradients.push(this.gradients[i  ][j+1][k  ]);    
+                    isoValues.push(this.data[i+1][j+1][k  ]);   gradients.push(this.gradients[i+1][j+1][k  ]);  
+                    isoValues.push(this.data[i+1][j+1][k+1]);   gradients.push(this.gradients[i+1][j+1][k+1]);  
+                    isoValues.push(this.data[i  ][j+1][k+1]);   gradients.push(this.gradients[i  ][j+1][k+1]);  
+
 
                     var positions = [];
                     positions.push( new THREE.Vector3( i   * this.dx, j   * this.dy, k     * this.dz).subScalar(this.size/2));
@@ -543,7 +578,8 @@ function MarchingCubes(size, resolution){
 
                     var gridCell = {
                         positions: positions,
-                        isoValues: isoValues
+                        gradients: gradients,
+                        isoValues: isoValues,
                     };
 
                     gridCells.push(gridCell);
@@ -559,6 +595,8 @@ function MarchingCubes(size, resolution){
 
     function intializeData(){
         var data = new Array();
+        
+
         noise.seed(Math.random());
 
         var amplitude = 10.0;
@@ -588,7 +626,31 @@ function MarchingCubes(size, resolution){
                 }
             }
         }
-        return data;
+        
+        // Edge cases are set to 'undefined'
+        var gradients = new Array();
+
+        for(var i=0; i < this.resolution; i++){
+            gradients[i] = new Array();
+            for(var j=0; j < this.resolution; j++){
+                gradients[i][j] = new Array();
+                for(var k=0; k < this.resolution; k++){
+                    
+                    try{
+                        gradients[i][j][k] = new THREE.Vector3();
+                        gradients[i][j][k].x = -0.5 * ( (data[i-1][j  ][k  ] - data[i+1][j  ][k  ]) / this.dx )
+                        gradients[i][j][k].y = -0.5 * ( (data[i  ][j-1][k  ] - data[i  ][j+1][k  ]) / this.dy )
+                        gradients[i][j][k].z = -0.5 * ( (data[i  ][j  ][k-1] - data[i  ][j  ][k+1]) / this.dz )
+                    } catch(e){
+                        gradients[i][j][k] = new THREE.Vector3(0.0, 1.0, 0.0);
+                    }
+
+                }
+            }
+        } 
+
+        this.data = data;
+        this.gradients = gradients;
     }
     
     return context;
