@@ -27,7 +27,7 @@ function MarchingCubes(size, resolution){
         this.dx = this.dy = this.dz = this.size / this.resolution;
         this.data = intializeData();
     
-        this.isoValue = 20;
+        this.isoValue = 0;
 
         // Lookup tables from Paul Bourke's implementation
         // http://paulbourke.net/geometry/polygonise/
@@ -559,6 +559,9 @@ function MarchingCubes(size, resolution){
 
     function intializeData(){
         var data = new Array();
+        noise.seed(Math.random());
+
+        var amplitude = 10.0;
 
         for(var i=0; i < this.resolution; i++){
             data[i] = new Array();
@@ -567,8 +570,22 @@ function MarchingCubes(size, resolution){
 
                 for(var k=0; k < this.resolution; k++){
                     var pos = new THREE.Vector3(i * this.dx, j * this.dy, k * this.dz);
-                    data[i][j][k] = Math.abs(dist(pos.x, pos.y, pos.z, size/2, size/2, size/2));
-                }   
+
+                    var noiseSum = pos.y;
+                    var freqIndex = 0;
+                    var freqs = [0.01, 0.0214, 0.0397, 0.0809, 0.162, 0.318, 0.645, 1.199, 2.403];
+                    for (var div = 1.0; div < 256.0; div*=2)
+                    {
+                        noiseSum += amplitude/div * noise.simplex3(freqs[freqIndex] * pos.x,
+                                freqs[freqIndex] * pos.y, freqs[freqIndex] * pos.z);
+                        freqIndex++;
+                    }
+                    /*noiseSum += amplitude * noise.simplex3(freq * pos.x, freq * pos.y, freq * pos.z);
+                    noiseSum += amplitude / 2 * noise.simplex3(freq * 2.07 * pos.x, freq * 2.07* pos.y, freq* 2.07 * pos.z);
+                    noiseSum += amplitude / 4 * noise.simplex3(freq * 3.93 * pos.x, freq * 3.93* pos.y, freq* 3.93 * pos.z);
+                    */
+                    data[i][j][k] =  -13.0 + ( noiseSum);
+                }
             }
         }
         return data;

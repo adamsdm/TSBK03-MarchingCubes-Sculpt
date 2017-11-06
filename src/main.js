@@ -21,7 +21,7 @@ shaders.shaderSetLoaded = function(){
 
 // Initial parameter values
 var parameters = {
-    isolation: 20,
+    isolation: 0,
     renderVertNorms: false,
     renderFaceNorms: false,
     wireframe: false,
@@ -46,7 +46,7 @@ function init() {
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
     // Marching cubes
-    var resolution = 50;
+    var resolution = 70;
     var size = 141;
     volume = MarchingCubes(size, resolution);
     volume.init();
@@ -89,7 +89,7 @@ function displayGUI(){
 
     var simulationFolder = gui.addFolder('Simulation');
     simulationFolder.open();
-    var isoVal = simulationFolder.add(parameters, 'isolation').min(10.0).max(40).step(0.01).name('Iso-value');
+    var isoVal = simulationFolder.add(parameters, 'isolation').min(-10.0).max(40).step(0.01).name('Iso-value');
 
     var debugFolder = gui.addFolder('Debug');
     debugFolder.open();
