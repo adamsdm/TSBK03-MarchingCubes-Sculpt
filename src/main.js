@@ -49,7 +49,13 @@ function init() {
     var resolution = 51;
     var size = 101;
     volume = MarchingCubes(size, resolution);
-    volume.init();
+    var volumeMaterial = new THREE.ShaderMaterial( {
+        vertexShader: shaders.vertexShaders.VERT,        
+        fragmentShader: shaders.fragmentShaders.FRAG
+        } 
+    );
+
+    volume.init(volumeMaterial);
     volume.scene = scene;
     volume.parameters = parameters;
 

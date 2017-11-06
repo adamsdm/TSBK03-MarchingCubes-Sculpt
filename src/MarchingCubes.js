@@ -21,11 +21,11 @@ function MarchingCubes(size, resolution){
     this.mesh = new THREE.Mesh( this.geometry, this.volumeMaterial );
 
 
-    this.init = function(){
+    this.init = function(material){
         this.resolution = resolution || 10;
         this.size = size || 10;
         this.dx = this.dy = this.dz = this.size / this.resolution;
-        
+        this.volumeMaterial = material;
     
         this.isoValue = 0;
 
