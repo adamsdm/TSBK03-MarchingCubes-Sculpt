@@ -47,7 +47,7 @@ function init() {
 
     // lights
     var pointLight = new THREE.PointLight(0xff0000, 1, 100);
-    pointLight.position.set(10, 100, 10);
+    pointLight.position.set(10, 10, 10);
     scene.add(pointLight);
 
     var sphereSize = 1;
