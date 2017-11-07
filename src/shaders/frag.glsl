@@ -6,8 +6,9 @@ varying vec3 vNormal;
 void main()	{
     vec3 grassColor = vec3(0.18,0.65,0.12);
     vec3 stoneColor = vec3(0.57, 0.57, 0.57);
+    vec3 finalColor = grassColor;
     vec3 light = normalize(lightPos);
-
+    
     float kd = 0.9;
     float ka = 0.6;
 
@@ -18,7 +19,7 @@ void main()	{
 
     float theta = acos( dot(vNormal, up) ); 
 
-    vec3 finalColor=mix(grassColor, stoneColor, smoothstep(0.6, 1.0, theta));
+    finalColor=mix(grassColor, stoneColor, smoothstep(0.6, 1.0, theta));
 
     vec3 ambient = ka * finalColor;
     vec3 diffuse = kd * finalColor * max(0.0, dot(vNormal, light));
