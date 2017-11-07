@@ -172,6 +172,7 @@ float pnoise(vec3 P, vec3 rep)
   return 2.2 * n_xyz;
 }
 
+
 uniform vec3 lightPos;
 uniform vec3 cameraPos;
 
@@ -183,9 +184,10 @@ varying vec3 vNormal;
 void main()	{
     vec3 grassColor = vec3(0.18,0.65,0.12);
     vec3 dirtColor = vec3(0.60,0.32,0.07);
-    vec3 stoneColor = vec3(0.57, 0.57, 0.57);
+    vec3 stoneColor = vec3(0.40, 0.40, 0.40);
     vec3 finalColor = grassColor;
     vec3 light = normalize(lightPos);
+
     
     float kd = 0.6;
     float ka = 0.2;
@@ -202,13 +204,18 @@ void main()	{
     
 
     // ROCKS
-
+    stoneColor = stoneColor - 0.1 * pnoise( 0.1*pos, vec3(10.0) );    // HF noise
+    stoneColor = stoneColor - 0.1 * pnoise( 1.0*pos, vec3(10.0) );    // LF noise
+    stoneColor = stoneColor - 0.1 * pnoise( 3.0*pos, vec3(10.0) );    // LF noise
+    stoneColor = stoneColor - 0.05 * pnoise( 8.0*pos, vec3(10.0) );    // LF noise
     
+
+
     // Theta = arccos( (a * b) / ( ||a|| ||b|| ) )
     vec3 up = vec3(0.0, 1.0, 0.0);
     float theta = acos( dot(vNormal, up) ); 
 
-    finalColor=mix(grassColor, stoneColor, smoothstep(0.4, 1.0, theta));
+    finalColor=mix(grassColor, stoneColor, smoothstep(0.2, 1.0, theta));
     
     
 
