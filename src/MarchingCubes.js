@@ -599,7 +599,7 @@ function MarchingCubes(size, resolution){
 
         noise.seed(Math.random());
 
-        var amplitude = 10.0;
+        var amplitude = 15.0;
 
         for(var i=0; i < this.resolution; i++){
             data[i] = new Array();
