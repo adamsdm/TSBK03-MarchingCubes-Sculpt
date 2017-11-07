@@ -50,9 +50,6 @@ function init() {
     pointLight.position.set(10, 10, 10);
     scene.add(pointLight);
 
-    var sphereSize = 1;
-    var pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
-    scene.add(pointLightHelper);
 
     // Marching cubes
     var resolution = 51;
@@ -76,10 +73,9 @@ function init() {
     // Raycasting
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
-    var helperGeometry = new THREE.CylinderGeometry( 0, 2, 4, 3 );
-    helperGeometry.translate( 0, 2, 0 );
-    helperGeometry.rotateX( Math.PI / 2 );
-    helper = new THREE.Mesh( helperGeometry, new THREE.MeshNormalMaterial() );
+    var helperGeometry = new THREE.SphereGeometry(2, 32, 32);
+
+    helper = new THREE.Mesh(helperGeometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.7, color: 0xffffff }) );
     scene.add( helper );
 
 
@@ -88,6 +84,8 @@ function init() {
 
     window.addEventListener( 'resize', onWindowResize, false );
     container.addEventListener( 'mousemove', onMouseMove, false );
+    container.addEventListener('mousedown', onMouseClick, false);
+    
 
 }
 
@@ -183,6 +181,36 @@ function onMouseMove( event ) {
         helper.position.set( 0, 0, 0 );
         helper.lookAt( intersects[ 0 ].face.normal );
         helper.position.copy( intersects[ 0 ].point );    
+
+    }
+}
+
+function onMouseClick(event){
+    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = - (event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+
+
+    raycaster.setFromCamera(mouse, camera);
+    
+    var intersects = raycaster.intersectObject(mesh);
+    var x,y,z, i,j,k;
+    if (intersects.length > 0) {
+
+        // x,y,z position
+        x = intersects[0].point.x;
+        y = intersects[0].point.y;
+        z = intersects[0].point.z;
+
+        console.log(volume.resolution);
+
+        i = Math.round((x / volume.dx) + (volume.resolution / 2));
+        j = Math.round((y / volume.dy) + (volume.resolution / 2));
+        k = Math.round((z / volume.dz) + (volume.resolution / 2));
+
+        console.log(i,j,k);
+
+        volume.paint(i,j,k);
+
 
     }
 }

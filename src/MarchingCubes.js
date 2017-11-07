@@ -337,6 +337,11 @@ function MarchingCubes(size, resolution){
         $('#loadscreen').fadeOut();
     };
 
+    this.paint = function(i,j,k){
+        console.log("PAINTING..");
+        //this.data[i][j][k] = 100;
+    }
+
     this.setISO = function(value) {
 
         this.isoValue = value;
@@ -348,12 +353,11 @@ function MarchingCubes(size, resolution){
     };
 
     this.generateMesh = function(){
+        console.log("Generating mesh...");
         this.geometry.dispose();
         this.geometry = new THREE.Geometry();
         
         this.vertexIndex = 0; 
-
-        console.log(this.gridCells[200]);
 
         for(var i=0; i < this.gridCells.length; i++){
             this.polygonise(this.gridCells[i]);
