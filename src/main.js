@@ -55,7 +55,7 @@ function init() {
     scene.add(pointLightHelper);
 
     // Marching cubes
-    var resolution = 51;
+    var resolution = 71;
     var size = 101;
     volume = MarchingCubes(size, resolution);
     var volumeMaterial = new THREE.ShaderMaterial( {

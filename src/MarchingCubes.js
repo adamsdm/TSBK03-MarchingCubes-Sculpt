@@ -600,6 +600,7 @@ function MarchingCubes(size, resolution){
         noise.seed(Math.random());
 
         var amplitude = 15.0;
+        var hardFloor = 19.0;
 
         for(var i=0; i < this.resolution; i++){
             data[i] = new Array();
@@ -610,6 +611,19 @@ function MarchingCubes(size, resolution){
                     var pos = new THREE.Vector3(i * this.dx, j * this.dy, k * this.dz);
 
                     var noiseSum = pos.y;
+                    var orgPosY = pos.y;
+                    //warp coordinates before noise octaves are calculated
+                    // low freq + high amplitude -> more caves and arches
+                    // medium freq + low amplitude -> ropey, organic terrain
+
+                    var warpFreq = 0.1;
+                    var warpAmplitude = 2.0;
+                    var warp =  noise.simplex3(pos.x * warpFreq, pos.y * warpFreq, pos.z * warpFreq);
+
+                    pos.x += warpAmplitude * warp;
+                    pos.y += warpAmplitude * warp;
+                    pos.z += warpAmplitude * warp;
+
                     var freqIndex = 0;
                     var freqs = [0.01, 0.0214, 0.0397, 0.0809, 0.162, 0.318, 0.645, 1.199, 2.403];
                     for (var div = 1.0; div < 256.0; div*=2)
@@ -618,11 +632,11 @@ function MarchingCubes(size, resolution){
                                 freqs[freqIndex] * pos.y, freqs[freqIndex] * pos.z);
                         freqIndex++;
                     }
-                    /*noiseSum += amplitude * noise.simplex3(freq * pos.x, freq * pos.y, freq * pos.z);
-                    noiseSum += amplitude / 2 * noise.simplex3(freq * 2.07 * pos.x, freq * 2.07* pos.y, freq* 2.07 * pos.z);
-                    noiseSum += amplitude / 4 * noise.simplex3(freq * 3.93 * pos.x, freq * 3.93* pos.y, freq* 3.93 * pos.z);
-                    */
+
+
+
                     data[i][j][k] =  -25 + ( noiseSum);
+                    //data[i][j][k] += Math.min(Math.max((hardFloor - orgPosY) * 3.0, 0.0), 1.0) * 40;
                 }
             }
         }
