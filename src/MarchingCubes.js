@@ -353,7 +353,7 @@ function MarchingCubes(size, resolution){
         
         this.vertexIndex = 0; 
 
-        console.log(this.gridCells[200]);
+        //console.log(this.gridCells[200]);
 
         for(var i=0; i < this.gridCells.length; i++){
             this.polygonise(this.gridCells[i]);
