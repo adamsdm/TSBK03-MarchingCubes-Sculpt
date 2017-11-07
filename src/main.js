@@ -45,13 +45,27 @@ function init() {
 
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
+    // lights
+    var pointLight = new THREE.PointLight(0xff0000, 1, 100);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
+
+    var sphereSize = 1;
+    var pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
+    scene.add(pointLightHelper);
+
     // Marching cubes
     var resolution = 51;
     var size = 101;
     volume = MarchingCubes(size, resolution);
     var volumeMaterial = new THREE.ShaderMaterial( {
-        vertexShader: shaders.vertexShaders.VERT,        
-        fragmentShader: shaders.fragmentShaders.FRAG
+            uniforms: {
+                lightPos: { value: pointLight.position },
+                cameraPos: { value: camera.position },
+            },
+
+            vertexShader: shaders.vertexShaders.VERT,        
+            fragmentShader: shaders.fragmentShaders.FRAG
         } 
     );
 
@@ -68,17 +82,6 @@ function init() {
     helper = new THREE.Mesh( helperGeometry, new THREE.MeshNormalMaterial() );
     scene.add( helper );
 
-    // lights
-    var light = new THREE.DirectionalLight( 0xffffff );
-    light.position.set( 1, 1, 1 );
-    scene.add( light );
-
-    var light = new THREE.DirectionalLight( 0x002288 );
-    light.position.set( -1, -1, -1 );
-    scene.add( light );
-
-    var light = new THREE.AmbientLight( 0x222222 );
-    scene.add( light );
 
     stats = new Stats();
     container.appendChild( stats.dom );

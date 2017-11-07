@@ -622,7 +622,7 @@ function MarchingCubes(size, resolution){
                     noiseSum += amplitude / 2 * noise.simplex3(freq * 2.07 * pos.x, freq * 2.07* pos.y, freq* 2.07 * pos.z);
                     noiseSum += amplitude / 4 * noise.simplex3(freq * 3.93 * pos.x, freq * 3.93* pos.y, freq* 3.93 * pos.z);
                     */
-                    data[i][j][k] =  -15.0 + ( noiseSum);
+                    data[i][j][k] =  -25 + ( noiseSum);
                 }
             }
         }
