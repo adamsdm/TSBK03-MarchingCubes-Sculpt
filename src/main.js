@@ -6,8 +6,8 @@ var stats;
 var camera, controls, scene, renderer;
 var volume, raycaster, mouse;
 
-var pathToShaders = '/src/shaders';
-var pathToChunks  = '/src/chunks';
+var pathToShaders = './src/shaders';
+var pathToChunks  = './src/chunks';
 
 var shaders = new ShaderLoader( pathToShaders , pathToChunks );
 shaders.load( 'vert' , 'VERT'  , 'vertex'      );
@@ -52,7 +52,7 @@ function init() {
 
 
     // Marching cubes
-    var resolution = 51;
+    var resolution = 71;
     var size = 101;
     volume = MarchingCubes(size, resolution);
     var volumeMaterial = new THREE.ShaderMaterial( {
