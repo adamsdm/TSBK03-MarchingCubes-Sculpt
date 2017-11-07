@@ -9,8 +9,8 @@ void main()	{
     vec3 finalColor = grassColor;
     vec3 light = normalize(lightPos);
     
-    float kd = 0.9;
-    float ka = 0.6;
+    float kd = 0.6;
+    float ka = 0.2;
 
 
     // Mix colors here before applying phong
@@ -26,5 +26,5 @@ void main()	{
 
     finalColor = ambient+diffuse;
 
-    gl_FragColor=vec4(theta*vec3(finalColor), 1.0);
+    gl_FragColor=vec4(finalColor, 1.0);
 }
