@@ -353,20 +353,20 @@ function MarchingCubes(size, resolution){
     };
 
     this.generateMesh = function(){
-        console.log("Generating mesh...");
         this.geometry.dispose();
         this.geometry = new THREE.Geometry();
         
         this.vertexIndex = 0; 
-
+        
+        
         for(var i=0; i < this.gridCells.length; i++){
             this.polygonise(this.gridCells[i]);
         }
-
         
-         this.geometry.computeFaceNormals();
+        // Huge performance bottleneck and redundant since we calculate vertex normals manually
+        // this.geometry.computeFaceNormals();
         // this.geometry.computeVertexNormals();
-        this.geometry.computeBoundingSphere();
+        // this.geometry.computeBoundingSphere();
 
         this.scene.remove(this.mesh);
         this.mesh = new THREE.Mesh( this.geometry, this.volumeMaterial );
@@ -386,7 +386,6 @@ function MarchingCubes(size, resolution){
         if(this.parameters.renderFaceNorms){
             this.scene.add(this.meshFaceNormals);
         }
-
     };
 
     this.polygonise = function(gridCell)
