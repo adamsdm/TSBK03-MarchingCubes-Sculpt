@@ -175,6 +175,7 @@ float pnoise(vec3 P, vec3 rep)
 
 uniform vec3 lightPos;
 uniform vec3 cameraPos;
+uniform float waterLevel;
 
 varying vec3 pos;
 varying vec3 vNormal;
@@ -226,7 +227,7 @@ void main()	{
     float theta = acos( dot(vNormal, up) ); 
 
     finalColor=mix(grassColor, stoneColor, smoothstep(0.2, 1.0, theta));
-    finalColor = mix(sandColor, finalColor, smoothstep(0.0, 1.0, pos.y + 33.0));
+    finalColor = mix(sandColor, finalColor, smoothstep(0.0, 1.0, pos.y + waterLevel));
     
     
 

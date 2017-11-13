@@ -56,6 +56,7 @@ function init() {
 
 
     // Marching cubes
+    var waterLevel = 33.0;
     var resolution = 71;
     var size = 101;
     volume = MarchingCubes(size, resolution);
@@ -63,6 +64,7 @@ function init() {
             uniforms: {
                 lightPos: { value: pointLight.position },
                 cameraPos: { value: camera.position },
+                waterLevel: {type: 'f', value: waterLevel}
             },
 
             vertexShader: shaders.vertexShaders.VERT,        
@@ -100,7 +102,7 @@ function init() {
 
     var water = new THREE.Mesh(waterPlane, waterMaterial);
     water.rotateX(-Math.PI/2);
-    water.position.y = -33;
+    water.position.y = -waterLevel;
     scene.add(water);
 
     stats = new Stats();

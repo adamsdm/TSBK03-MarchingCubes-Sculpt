@@ -106,6 +106,7 @@ uniform vec3 lightPos;
 uniform vec3 cameraPos;
 uniform float time;
 
+
 varying vec3 pos;
 varying vec3 vNormal;
 
