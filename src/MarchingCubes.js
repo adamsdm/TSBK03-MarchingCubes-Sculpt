@@ -340,7 +340,7 @@ function MarchingCubes(size, resolution){
     this.paint = function(i,j,k){
         console.log("PAINTING..");
         //this.data[i][j][k] = 100;
-    }
+    };
 
     this.setISO = function(value) {
 
@@ -603,7 +603,7 @@ function MarchingCubes(size, resolution){
         noise.seed(Math.random());
 
         var amplitude = 15.0;
-        var hardFloor = 19.0;
+        var hardFloor = 15.0;
 
         for(var i=0; i < this.resolution; i++){
             data[i] = new Array();
@@ -639,7 +639,7 @@ function MarchingCubes(size, resolution){
 
 
                     data[i][j][k] =  -25 + ( noiseSum);
-                    //data[i][j][k] += Math.min(Math.max((hardFloor - orgPosY) * 3.0, 0.0), 1.0) * 40;
+                    data[i][j][k] += Math.min(Math.max((hardFloor - orgPosY) * 3.0, 0.0), 1.0) * 40;
                 }
             }
         }

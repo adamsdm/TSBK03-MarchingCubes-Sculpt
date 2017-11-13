@@ -1,7 +1,8 @@
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var stats;
-
+var clock = new THREE.Clock(true);
+var waterMaterial;
 
 var camera, controls, scene, renderer;
 var volume, raycaster, mouse;
@@ -12,6 +13,7 @@ var pathToChunks  = './src/chunks';
 var shaders = new ShaderLoader( pathToShaders , pathToChunks );
 shaders.load( 'vert' , 'VERT'  , 'vertex'      );
 shaders.load( 'frag' , 'FRAG'  , 'fragment'    );
+shaders.load( 'waterFrag', 'WATERFRAG', 'fragment' );
 
 shaders.shaderSetLoaded = function(){
     init();
@@ -30,6 +32,8 @@ var parameters = {
 
 function init() {
 
+
+    var time = 1.0;
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x42cbf4 );
 
@@ -78,6 +82,25 @@ function init() {
     helper = new THREE.Mesh(helperGeometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.7, color: 0xffffff }) );
     scene.add( helper );
 
+    //water plane
+    var waterPlane = new THREE.PlaneGeometry(size,size,20,20);
+
+    waterMaterial = new THREE.ShaderMaterial( {
+            uniforms: {
+                lightPos: { value: pointLight.position },
+                cameraPos: { value: camera.position },
+                time: {type: 'f', value: time}
+            },
+
+            vertexShader: shaders.vertexShaders.VERT,
+            fragmentShader: shaders.fragmentShaders.WATERFRAG
+        }
+    );
+
+    var water = new THREE.Mesh(waterPlane, waterMaterial);
+    water.rotateX(-Math.PI/2);
+    water.position.y = -33;
+    scene.add(water);
 
     stats = new Stats();
     container.appendChild( stats.dom );
@@ -129,7 +152,7 @@ function displayGUI(){
 
     wireframe.onChange(function(jar){
         volume.volumeMaterial.wireframe = jar;
-    })
+    });
 
     showBillboards.onChange(function(jar){
         if(jar){
@@ -163,6 +186,7 @@ function animate() {
 }
 
 function render() {
+    waterMaterial.uniforms.time.value += clock.getDelta();
     renderer.render( scene, camera );
 }
 
