@@ -185,6 +185,7 @@ void main()	{
     vec3 grassColor = vec3(0.18,0.65,0.12);
     vec3 dirtColor = vec3(0.60,0.32,0.07);
     vec3 stoneColor = vec3(0.40, 0.40, 0.40);
+    vec3 sandColor = vec3(0.71, 0.64, 0.16);
     vec3 finalColor = grassColor;
     vec3 light = normalize(lightPos);
 
@@ -192,30 +193,40 @@ void main()	{
     float kd = 0.6;
     float ka = 0.2;
 
-
+    //noise octaves
+    float noise1 = 0.1 * pnoise( 0.1*pos, vec3(10.0));
+    float noise2 = 0.1 * pnoise( 1.0*pos, vec3(10.0));
+    float noise3 = 0.1 * pnoise( 3.0*pos, vec3(10.0));
+    float noise4 = 0.05 * pnoise( 8.0*pos, vec3(10.0));
     // Mix colors here before applying phong
     // GRASS
+
     grassColor = mix(grassColor, dirtColor, 0.4*pnoise( 0.2*pos, vec3(10.0))); // Add dirt patches
-    grassColor = grassColor - 0.1 * pnoise( 0.1*pos, vec3(10.0) );    // HF noise
-    grassColor = grassColor - 0.1 * pnoise( 1.0*pos, vec3(10.0) );    // LF noise
-    grassColor = grassColor - 0.1 * pnoise( 3.0*pos, vec3(10.0) );    // LF noise
-    grassColor = grassColor - 0.05 * pnoise( 8.0*pos, vec3(10.0) );    // LF noise
+    grassColor = grassColor -  noise1;    // HF noise
+    grassColor = grassColor -  noise2;    // LF noise
+    grassColor = grassColor -  noise3;    // LF noise
+    grassColor = grassColor - noise4;    // LF noise
 
     
 
     // ROCKS
-    stoneColor = stoneColor - 0.1 * pnoise( 0.1*pos, vec3(10.0) );    // HF noise
-    stoneColor = stoneColor - 0.1 * pnoise( 1.0*pos, vec3(10.0) );    // LF noise
-    stoneColor = stoneColor - 0.1 * pnoise( 3.0*pos, vec3(10.0) );    // LF noise
-    stoneColor = stoneColor - 0.05 * pnoise( 8.0*pos, vec3(10.0) );    // LF noise
+    stoneColor = stoneColor - noise1;    // HF noise
+    stoneColor = stoneColor - noise2;    // LF noise
+    stoneColor = stoneColor - noise3;    // LF noise
+    stoneColor = stoneColor - noise4;    // LF noise
     
-
+    // SAND
+    sandColor -= noise1;
+    sandColor -= noise2;
+    sandColor -= noise3;
+    sandColor -= noise4;
 
     // Theta = arccos( (a * b) / ( ||a|| ||b|| ) )
     vec3 up = vec3(0.0, 1.0, 0.0);
     float theta = acos( dot(vNormal, up) ); 
 
     finalColor=mix(grassColor, stoneColor, smoothstep(0.2, 1.0, theta));
+    finalColor = mix(sandColor, finalColor, smoothstep(0.0, 1.0, pos.y + 33.0));
     
     
 

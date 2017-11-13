@@ -96,6 +96,7 @@ function init() {
             fragmentShader: shaders.fragmentShaders.WATERFRAG
         }
     );
+    waterMaterial.transparent = true;
 
     var water = new THREE.Mesh(waterPlane, waterMaterial);
     water.rotateX(-Math.PI/2);
@@ -225,7 +226,7 @@ function onMouseClick(event){
         y = intersects[0].point.y;
         z = intersects[0].point.z;
 
-        console.log(volume.resolution);
+        //console.log(volume.resolution);
 
         i = Math.round((x / volume.dx) + (volume.resolution / 2));
         j = Math.round((y / volume.dy) + (volume.resolution / 2));

@@ -340,6 +340,7 @@ function MarchingCubes(size, resolution){
     this.paint = function(i,j,k){
         console.log("PAINTING..");
         //this.data[i][j][k] = 100;
+       // for (var x, )
     };
 
     this.setISO = function(value) {
@@ -639,7 +640,7 @@ function MarchingCubes(size, resolution){
 
 
                     data[i][j][k] =  -25 + ( noiseSum);
-                    data[i][j][k] += Math.min(Math.max((hardFloor - orgPosY) * 3.0, 0.0), 1.0) * 40;
+                    //data[i][j][k] += Math.min(Math.max((hardFloor - orgPosY) * 3.0, 0.0), 1.0) * 40;
                 }
             }
         }

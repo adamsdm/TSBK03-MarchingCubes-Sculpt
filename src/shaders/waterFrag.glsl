@@ -117,7 +117,9 @@ void main() {
 
     vec3 lightColor = vec3(1.0);
 
-    float waterNoise = cnoise(pos * 0.5 + vec3(0.2, 0.4, 0.3) * time);
+    float waterNoise = cnoise(4.0 * pos * 0.5 + vec3(0.2, 0.4, 0.3) * time);
+    waterNoise += cnoise(2.0 * pos * 0.5 + vec3(0.2, 0.4, 0.3) * time);
+    waterNoise += cnoise(1.0 * pos * 0.5 + vec3(0.2, 0.4, 0.3) * time);
     waterColor = waterColor + 0.1 * waterNoise;
 
     //phong shading
@@ -141,6 +143,6 @@ void main() {
 
     vec3 finalColor = (ambient + diffuse + specular) * waterColor;
 
-    gl_FragColor = vec4(finalColor, 0.6);
+    gl_FragColor = vec4(finalColor, 0.5);
 
 }
