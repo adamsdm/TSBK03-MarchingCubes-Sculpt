@@ -105,6 +105,24 @@ function init() {
     water.position.y = -waterLevel;
     scene.add(water);
 
+    //skybox
+    var boxGeo = new THREE.BoxGeometry(1000,1000,1000);
+    var boxMaterials =
+        [
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('textures/skybox/sky_front.png'), side: THREE.DoubleSide}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('textures/skybox/sky_back.png'), side: THREE.DoubleSide}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('textures/skybox/sky_up.png'), side: THREE.DoubleSide}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('textures/skybox/sky_down.png'), side: THREE.DoubleSide}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('textures/skybox/sky_right.png'), side: THREE.DoubleSide}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('textures/skybox/sky_left.png'), side: THREE.DoubleSide})
+        ];
+
+    var boxMaterial = new THREE.MeshFaceMaterial(boxMaterials);
+    var skybox = new THREE.Mesh(boxGeo, boxMaterial);
+    scene.add(skybox);
+
+
+
     stats = new Stats();
     container.appendChild( stats.dom );
 
@@ -234,7 +252,7 @@ function onMouseClick(event){
         j = Math.round((y / volume.dy) + (volume.resolution / 2));
         k = Math.round((z / volume.dz) + (volume.resolution / 2));
 
-        console.log(i,j,k);
+        //console.log(i,j,k);
 
         volume.paint(i,j,k);
 

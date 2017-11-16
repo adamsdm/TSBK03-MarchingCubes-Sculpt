@@ -194,11 +194,11 @@ void main()	{
     float kd = 0.6;
     float ka = 0.2;
 
-    //noise octaves
-    float noise1 = 0.1 * pnoise( 0.1*pos, vec3(10.0));
-    float noise2 = 0.1 * pnoise( 1.0*pos, vec3(10.0));
-    float noise3 = 0.1 * pnoise( 3.0*pos, vec3(10.0));
-    float noise4 = 0.05 * pnoise( 8.0*pos, vec3(10.0));
+    //noise octaves 0.1 1.0 3.0 8.0
+    float noise1 = 0.1 * pnoise( 1.0*pos, vec3(10.0));
+    float noise2 = 0.1 * pnoise( 2.56*pos, vec3(10.0));
+    float noise3 = 0.1 * pnoise( 6.43*pos, vec3(10.0));
+    float noise4 = 0.05 * pnoise( 15.0*pos, vec3(10.0));
     // Mix colors here before applying phong
     // GRASS
 

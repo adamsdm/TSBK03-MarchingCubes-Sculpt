@@ -340,7 +340,58 @@ function MarchingCubes(size, resolution){
     this.paint = function(i,j,k){
         console.log("PAINTING..");
         //this.data[i][j][k] = 100;
-       // for (var x, )
+        console.log("before: " + this.data[i+5][j+5][k+5]);
+        var paintSize = 10;
+
+        //x is constant
+        for (var y = j - paintSize; y < j + paintSize; y++)
+        {
+            for (var z = k - paintSize; z < k + paintSize; z++)
+            {
+                this.data[i+paintSize][y][z] = this.isoValue;
+            }
+        }
+        for (var y = j - paintSize; y < j + paintSize; y++)
+        {
+            for (var z = k - paintSize; z < k + paintSize; z++)
+            {
+                this.data[i-paintSize][y][z] = this.isoValue;
+            }
+        }
+        //y is constant
+        for (var x = j - paintSize; x < j + paintSize; x++)
+        {
+            for (var z = k - paintSize; z < k + paintSize; z++)
+            {
+                this.data[x][j+paintSize][z] = this.isoValue;
+            }
+        }
+        for (var x = j - paintSize; x < j + paintSize; x++)
+        {
+            for (var z = k - paintSize; z < k + paintSize; z++)
+            {
+                this.data[x][j-paintSize][z] = this.isoValue;
+            }
+        }
+        //z is constant
+        for (var x = j - paintSize; x < j + paintSize; x++)
+        {
+            for (var y = k - paintSize; y < k + paintSize; y++)
+            {
+                this.data[x][y][k + paintSize] = this.isoValue;
+            }
+        }
+        for (var x = j - paintSize; x < j + paintSize; x++)
+        {
+            for (var y = k - paintSize; y < k + paintSize; y++)
+            {
+                this.data[x][y][k - paintSize] = this.isoValue;
+            }
+        }
+
+        initCells();
+        console.log("after: " + this.data[i+10][j+5][k+5]);
+        this.generateMesh();
     };
 
     this.setISO = function(value) {
