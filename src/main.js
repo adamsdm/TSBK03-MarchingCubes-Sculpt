@@ -117,8 +117,7 @@ function init() {
             new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('textures/skybox/sky_left.png'), side: THREE.DoubleSide})
         ];
 
-    var boxMaterial = new THREE.MeshFaceMaterial(boxMaterials);
-    var skybox = new THREE.Mesh(boxGeo, boxMaterial);
+    var skybox = new THREE.Mesh(boxGeo, boxMaterials);
     scene.add(skybox);
 
 
@@ -234,7 +233,6 @@ function onMouseClick(event){
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
     mouse.y = - (event.clientY / renderer.domElement.clientHeight) * 2 + 1;
 
-
     raycaster.setFromCamera(mouse, camera);
     
     var intersects = raycaster.intersectObject(mesh);
@@ -246,15 +244,13 @@ function onMouseClick(event){
         y = intersects[0].point.y;
         z = intersects[0].point.z;
 
-        //console.log(volume.resolution);
 
         i = Math.round((x / volume.dx) + (volume.resolution / 2));
         j = Math.round((y / volume.dy) + (volume.resolution / 2));
         k = Math.round((z / volume.dz) + (volume.resolution / 2));
 
-        //console.log(i,j,k);
 
-        volume.paint(i,j,k);
+        volume.paint(i, j, k, event.button);
 
 
     }

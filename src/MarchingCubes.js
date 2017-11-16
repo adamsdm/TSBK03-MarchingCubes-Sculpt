@@ -8,6 +8,7 @@ function MarchingCubes(size, resolution){
     intializeData();
     this.gridCells = initCells();
     this.isoValue = 10;
+    this.data;
 
     // Billboards
     this.billboardGeometry = new THREE.Geometry();
@@ -337,60 +338,30 @@ function MarchingCubes(size, resolution){
         $('#loadscreen').fadeOut();
     };
 
-    this.paint = function(i,j,k){
+    this.paint = function(i,j,k, buttonPressed){
+        var offset;
+        // left-click
+        if (buttonPressed == 0)
+            offset = -0.1;
+        // right-click
+        else if (buttonPressed == 2)
+            offset = 0.1;
+
         console.log("PAINTING..");
-        //this.data[i][j][k] = 100;
-        console.log("before: " + this.data[i+5][j+5][k+5]);
-        var paintSize = 10;
+        var paintRadii = 3;
 
-        //x is constant
-        for (var y = j - paintSize; y < j + paintSize; y++)
+        for (var x = i - paintRadii; x < i + paintRadii; x++)
         {
-            for (var z = k - paintSize; z < k + paintSize; z++)
+            for (var y = j - paintRadii; y < j + paintRadii; y++)
             {
-                this.data[i+paintSize][y][z] = this.isoValue;
+                for (var z = k - paintRadii; z < k + paintRadii; z++)
+                {
+                    if ( dist(i, j, k, x, y, z) < paintRadii )
+                        this.data[x][y][z] = this.isoValue + offset;
+                }
             }
         }
-        for (var y = j - paintSize; y < j + paintSize; y++)
-        {
-            for (var z = k - paintSize; z < k + paintSize; z++)
-            {
-                this.data[i-paintSize][y][z] = this.isoValue;
-            }
-        }
-        //y is constant
-        for (var x = j - paintSize; x < j + paintSize; x++)
-        {
-            for (var z = k - paintSize; z < k + paintSize; z++)
-            {
-                this.data[x][j+paintSize][z] = this.isoValue;
-            }
-        }
-        for (var x = j - paintSize; x < j + paintSize; x++)
-        {
-            for (var z = k - paintSize; z < k + paintSize; z++)
-            {
-                this.data[x][j-paintSize][z] = this.isoValue;
-            }
-        }
-        //z is constant
-        for (var x = j - paintSize; x < j + paintSize; x++)
-        {
-            for (var y = k - paintSize; y < k + paintSize; y++)
-            {
-                this.data[x][y][k + paintSize] = this.isoValue;
-            }
-        }
-        for (var x = j - paintSize; x < j + paintSize; x++)
-        {
-            for (var y = k - paintSize; y < k + paintSize; y++)
-            {
-                this.data[x][y][k - paintSize] = this.isoValue;
-            }
-        }
-
-        initCells();
-        console.log("after: " + this.data[i+10][j+5][k+5]);
+        this.gridCells = initCells();
         this.generateMesh();
     };
 
@@ -641,6 +612,7 @@ function MarchingCubes(size, resolution){
                 }
             }
         }
+
         return gridCells;
     }
 
