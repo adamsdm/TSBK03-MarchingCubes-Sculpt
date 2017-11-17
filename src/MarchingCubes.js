@@ -6,7 +6,7 @@ function MarchingCubes(size, resolution){
     this.size = size || 10;
     this.dx = this.dy = this.dz = this.size / this.resolution;
     intializeData();
-    this.gridCells = initCells();
+    this.gridCells = [];
     this.isoValue = 10;
     this.data;
 
@@ -325,7 +325,7 @@ function MarchingCubes(size, resolution){
             [0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
         ];
-
+        initCells();
         // Generate mesh
         this.generateMesh();
 
@@ -361,8 +361,11 @@ function MarchingCubes(size, resolution){
                 }
             }
         }
-        this.gridCells = initCells();
+        var t0 = performance.now();
+        initCells(i, j, k, paintRadii);
         this.generateMesh();
+        var t1 = performance.now();
+        console.log("initCells() took " + (t1-t0) + "ms");
     };
 
     this.setISO = function(value) {
@@ -567,12 +570,23 @@ function MarchingCubes(size, resolution){
         
     }
 
-    function initCells()
+    function initCells( x = 0, y = 0, z = 0, paintRadii = 0)
     {
-        var gridCells = [];
-        for ( var i = 0; i < this.resolution - 1; i ++ ) {
-            for ( var j = 0; j < this.resolution - 1; j ++ ) {
-                for ( var k = 0; k < this.resolution - 1; k ++ ) {
+        var sizeX, sizeY, sizeZ;
+        if ( x == 0)
+        {
+            sizeX = sizeY = sizeZ = this.resolution - 1;
+        }
+        else
+        {
+            sizeX = x + paintRadii;
+            sizeY = y + paintRadii;
+            sizeZ = z + paintRadii;
+        }
+        //var gridCells = [];
+        for ( var i = x - paintRadii; i < sizeX; i ++ ) {
+            for ( var j = y - paintRadii; j < sizeY; j ++ ) {
+                for ( var k = z - paintRadii; k < sizeZ; k ++ ) {
                     var isoValues = [];
                     var gradients = [];
                     //create a grid cell
@@ -608,12 +622,12 @@ function MarchingCubes(size, resolution){
                         isoValues: isoValues,
                     };
 
-                    gridCells.push(gridCell);
+                    this.gridCells.push(gridCell);
                 }
             }
         }
 
-        return gridCells;
+        //this.gridCells = gridCells;
     }
 
     function dist(x1, y1, z1, x2, y2, z2){
