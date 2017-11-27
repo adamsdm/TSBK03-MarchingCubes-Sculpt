@@ -348,9 +348,11 @@ function MarchingCubes(size, resolution){
             offset = 0.1;
 
         console.log("PAINTING..");
-        var paintRadii = 5;
 
         console.log( "number of vertices before paint: " + this.geometry.vertices.length);
+
+        var paintRadii = parameters.paintSize;
+
 
         for (var x = i - paintRadii; x < i + paintRadii; x++)
         {

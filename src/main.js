@@ -3,6 +3,7 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 var stats;
 var clock = new THREE.Clock(true);
 var waterMaterial;
+var helperGeometry;
 
 var camera, controls, scene, renderer;
 var volume, raycaster, mouse;
@@ -24,6 +25,7 @@ shaders.shaderSetLoaded = function(){
 // Initial parameter values
 var parameters = {
     isolation: 0,
+    paintSize: 2,
     renderVertNorms: false,
     renderFaceNorms: false,
     wireframe: false,
@@ -79,7 +81,7 @@ function init() {
     // Raycasting
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
-    var helperGeometry = new THREE.SphereGeometry(2, 32, 32);
+    helperGeometry = new THREE.SphereGeometry(parameters.paintSize, 32, 32);
 
     helper = new THREE.Mesh(helperGeometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.7, color: 0xffffff }) );
     scene.add( helper );
@@ -139,16 +141,23 @@ function displayGUI(){
 
     var simulationFolder = gui.addFolder('Simulation');
     simulationFolder.open();
+    var paintSize = simulationFolder.add(parameters, 'paintSize').min(1.0).max(6.0).step(0.1).name('Brush size');
     var isoVal = simulationFolder.add(parameters, 'isolation').min(-10.0).max(40).step(0.01).name('Iso-value');
 
     var debugFolder = gui.addFolder('Debug');
-    debugFolder.open();
+    
     var showVertNorms = debugFolder.add( parameters, 'renderVertNorms' ).name('Vert. norms');
     var showFaceNorms = debugFolder.add( parameters, 'renderFaceNorms' ).name('Face. norms');
     var wireframe = debugFolder.add( parameters, 'wireframe' ).name('Wireframe');
     var showBillboards = debugFolder.add( parameters, 'renderBillboards' ).name('Render billboards');
     
 
+    paintSize.onChange(function(jar){
+        scene.remove(helper);
+        helperGeometry = new THREE.SphereGeometry(parameters.paintSize, 32, 32);
+        helper = new THREE.Mesh(helperGeometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.7, color: 0xffffff }));
+        scene.add(helper);
+    });
 
     isoVal.onChange(function(jar){ 
         volume.setISO(jar); 
@@ -198,7 +207,9 @@ function animate() {
 
     requestAnimationFrame( animate );
 
+    
     controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
+    
 
     stats.update();
     render();
