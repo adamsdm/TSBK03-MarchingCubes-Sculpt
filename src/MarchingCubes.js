@@ -347,8 +347,7 @@ function MarchingCubes(size, resolution){
         else if (buttonPressed == 2)
             offset = 0.1;
 
-        console.log("PAINTING..");
-        var paintRadii = 3;
+        var paintRadii = parameters.paintSize;
 
         for (var x = i - paintRadii; x < i + paintRadii; x++)
         {
