@@ -346,6 +346,8 @@ function MarchingCubes(size, resolution){
         // right-click
         else if (buttonPressed == 2)
             offset = 0.1;
+        else
+            return;
 
         console.log("PAINTING..");
 
@@ -366,7 +368,9 @@ function MarchingCubes(size, resolution){
                     if ( distance < paintRadii ) {
                         var newIso = this.isoValue +
                             ( paintRadii / (distance + 1) - ((paintRadii + 1) / paintRadii)) * offset;
-                        if ( newIso < this.data[x][y][z] )
+                        if ( newIso < this.data[x][y][z] && offset < 0)
+                            this.data[x][y][z] = newIso;
+                        else if ( newIso > this.data[x][y][z] && offset > 0 )
                             this.data[x][y][z] = newIso;
                     }
                 }
