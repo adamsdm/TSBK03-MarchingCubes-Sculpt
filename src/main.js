@@ -141,7 +141,7 @@ function displayGUI(){
 
     var simulationFolder = gui.addFolder('Simulation');
     simulationFolder.open();
-    var paintSize = simulationFolder.add(parameters, 'paintSize').min(1.0).max(6.0).step(1.0).name('Brush size');
+    var paintSize = simulationFolder.add(parameters, 'paintSize').min(1.0).max(10.0).step(1.0).name('Brush size');
     var isoVal = simulationFolder.add(parameters, 'isolation').min(-10.0).max(40).step(0.01).name('Iso-value');
 
     var obj = { 

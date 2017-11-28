@@ -6,7 +6,7 @@ function MarchingCubes(size, resolution){
     this.size = size || 10;
     this.dx = this.dy = this.dz = this.size / this.resolution;
     intializeData();
-    this.gridCells = [];
+    this.gridCells;
     this.isoValue = 10;
     this.data;
 
@@ -339,7 +339,7 @@ function MarchingCubes(size, resolution){
     };
 
     this.paint = function(i,j,k, buttonPressed){
-        var offset;
+        var offset = 0;
         // left-click
         if (buttonPressed == 0)
             offset = -0.1;
@@ -347,7 +347,12 @@ function MarchingCubes(size, resolution){
         else if (buttonPressed == 2)
             offset = 0.1;
 
+        console.log("PAINTING..");
+
+        console.log( "number of vertices before paint: " + this.geometry.vertices.length);
+
         var paintRadii = parameters.paintSize;
+
 
         for (var x = i - paintRadii; x < i + paintRadii; x++)
         {
@@ -355,14 +360,21 @@ function MarchingCubes(size, resolution){
             {
                 for (var z = k - paintRadii; z < k + paintRadii; z++)
                 {
-                    if ( dist(i, j, k, x, y, z) < paintRadii )
-                        this.data[x][y][z] = this.isoValue + offset;
+                    // distance from center to currently evaluated point
+                    var distance = dist(i,j,k,x,y,z);
+                    if ( distance < paintRadii ) {
+                        var newIso = this.isoValue +
+                            ( paintRadii / (distance + 1) - ((paintRadii + 1) / paintRadii)) * offset;
+                        if ( newIso < this.data[x][y][z] )
+                            this.data[x][y][z] = newIso;
+                    }
                 }
             }
         }
         var t0 = performance.now();
-        initCells(i, j, k, paintRadii);
+        updateCells(i, j, k, paintRadii);
         this.generateMesh();
+        console.log( "number of vertices after paint: " + this.geometry.vertices.length);
         var t1 = performance.now();
         console.log("initCells() took " + (t1-t0) + "ms");
     };
@@ -384,8 +396,16 @@ function MarchingCubes(size, resolution){
         this.vertexIndex = 0; 
         
         
-        for(var i=0; i < this.gridCells.length; i++){
-            this.polygonise(this.gridCells[i]);
+
+        for(var i = 0; i < this.resolution - 1; i++)
+        {
+            for(var j = 0; j < this.resolution - 1; j++)
+            {
+                for(var k = 0; k < this.resolution - 1; k++)
+                {
+                    this.polygonise(this.gridCells[i][j][k]);
+                }
+            }
         }
         
         // Huge performance bottleneck and redundant since we calculate vertex normals manually
@@ -573,35 +593,72 @@ function MarchingCubes(size, resolution){
         
     }
 
-    function initCells( x = 0, y = 0, z = 0, paintRadii = 0)
+    function updateCells(x, y, z, paintRadii)
     {
-        var sizeX, sizeY, sizeZ;
-        if ( x == 0)
-        {
-            sizeX = sizeY = sizeZ = this.resolution - 1;
-        }
-        else
-        {
-            sizeX = x + paintRadii;
-            sizeY = y + paintRadii;
-            sizeZ = z + paintRadii;
-        }
-        //var gridCells = [];
-        for ( var i = x - paintRadii; i < sizeX; i ++ ) {
-            for ( var j = y - paintRadii; j < sizeY; j ++ ) {
-                for ( var k = z - paintRadii; k < sizeZ; k ++ ) {
+        for ( var i = x - paintRadii; i < x + paintRadii; i ++ ) {
+            for ( var j = y - paintRadii; j < y + paintRadii; j ++ ) {
+                for ( var k = z - paintRadii; k < z + paintRadii; k ++ ) {
                     var isoValues = [];
                     var gradients = [];
                     //create a grid cell
-                    //isoValues contains isovalue at each vertex/corner of cube
-                    
+                    //isoValues contains the isovalue at each vertex/corner of the cube
+
                     //bottom verrices of cube
+                    isoValues.push(this.data[i  ][j  ][k  ]);   gradients.push(this.gradients[i  ][j  ][k  ]);
+                    isoValues.push(this.data[i+1][j  ][k  ]);   gradients.push(this.gradients[i+1][j  ][k  ]);
+                    isoValues.push(this.data[i+1][j  ][k+1]);   gradients.push(this.gradients[i+1][j  ][k+1]);
+                    isoValues.push(this.data[i  ][j  ][k+1]);   gradients.push(this.gradients[i  ][j  ][k+1]);
+
+                    //top verrices of cube
+                    isoValues.push(this.data[i  ][j+1][k  ]);   gradients.push(this.gradients[i  ][j+1][k  ]);
+                    isoValues.push(this.data[i+1][j+1][k  ]);   gradients.push(this.gradients[i+1][j+1][k  ]);
+                    isoValues.push(this.data[i+1][j+1][k+1]);   gradients.push(this.gradients[i+1][j+1][k+1]);
+                    isoValues.push(this.data[i  ][j+1][k+1]);   gradients.push(this.gradients[i  ][j+1][k+1]);
+
+
+                    var positions = [];
+                    positions.push( new THREE.Vector3( i   * this.dx, j   * this.dy, k     * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)* this.dx, j   * this.dy, k     * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)* this.dx, j   * this.dy, (k+1) * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3( i   * this.dx, j   * this.dy, (k+1) * this.dz).subScalar(this.size/2));
+
+                    positions.push( new THREE.Vector3( i   * this.dx,(j+1)* this.dy, k     * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)* this.dx,(j+1)* this.dy, k     * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3((i+1)* this.dx,(j+1)* this.dy, (k+1) * this.dz).subScalar(this.size/2));
+                    positions.push( new THREE.Vector3(i    * this.dx,(j+1)* this.dy, (k+1) * this.dz).subScalar(this.size/2));
+
+                    var gridCell = {
+                        positions: positions,
+                        gradients: gradients,
+                        isoValues: isoValues
+                    };
+
+                    this.gridCells[i][j][k] = gridCell;
+                }
+            }
+        }
+    }
+
+    function initCells()
+    {
+        this.gridCells = new Array();
+        for ( var i = 0; i < this.resolution - 1; i++ ) {
+            this.gridCells[i] = new Array();
+            for ( var j = 0; j < this.resolution - 1; j++ ) {
+                this.gridCells[i][j] = new Array();
+                for ( var k = 0; k < this.resolution - 1; k++ ) {
+                    var isoValues = [];
+                    var gradients = [];
+                    //create a grid cell
+                    //isoValues contains the isovalue at each vertex/corner of the cube
+
+                    //bottom vertices of cube
                     isoValues.push(this.data[i  ][j  ][k  ]);   gradients.push(this.gradients[i  ][j  ][k  ]); 
                     isoValues.push(this.data[i+1][j  ][k  ]);   gradients.push(this.gradients[i+1][j  ][k  ]); 
                     isoValues.push(this.data[i+1][j  ][k+1]);   gradients.push(this.gradients[i+1][j  ][k+1]); 
                     isoValues.push(this.data[i  ][j  ][k+1]);   gradients.push(this.gradients[i  ][j  ][k+1]); 
                     
-                    //top verrices of cube
+                    //top vertices of cube
                     isoValues.push(this.data[i  ][j+1][k  ]);   gradients.push(this.gradients[i  ][j+1][k  ]);    
                     isoValues.push(this.data[i+1][j+1][k  ]);   gradients.push(this.gradients[i+1][j+1][k  ]);  
                     isoValues.push(this.data[i+1][j+1][k+1]);   gradients.push(this.gradients[i+1][j+1][k+1]);  
@@ -622,10 +679,9 @@ function MarchingCubes(size, resolution){
                     var gridCell = {
                         positions: positions,
                         gradients: gradients,
-                        isoValues: isoValues,
+                        isoValues: isoValues
                     };
-
-                    this.gridCells.push(gridCell);
+                    this.gridCells[i][j][k] = gridCell;
                 }
             }
         }
@@ -644,7 +700,6 @@ function MarchingCubes(size, resolution){
         noise.seed(Math.random());
 
         var amplitude = 15.0;
-        var hardFloor = 15.0;
 
         for(var i=0; i < this.resolution; i++){
             data[i] = new Array();
