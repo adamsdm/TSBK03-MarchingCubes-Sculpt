@@ -354,6 +354,7 @@ function MarchingCubes(size, resolution){
         var paintRadii = parameters.paintSize;
 
 
+        // Update data
         for (var x = i - paintRadii; x < i + paintRadii; x++)
         {
             for (var y = j - paintRadii; y < j + paintRadii; y++)
@@ -371,6 +372,24 @@ function MarchingCubes(size, resolution){
                 }
             }
         }
+
+        // Update gradients
+        for (var x = i - paintRadii; x < i + paintRadii; x++){
+            for (var y = j - paintRadii; y < j + paintRadii; y++){
+                for (var z = k - paintRadii; z < k + paintRadii; z++){
+                    try {
+                        gradients[x][y][z] = new THREE.Vector3();
+                        gradients[x][y][z].x = -0.5 * ((data[x - 1][y][z] - data[x + 1][y][z]) / this.dx)
+                        gradients[x][y][z].y = -0.5 * ((data[x][y - 1][z] - data[x][y + 1][z]) / this.dy)
+                        gradients[x][y][z].z = -0.5 * ((data[x][y][z - 1] - data[x][y][z + 1]) / this.dz)
+                    } catch (e) {
+                        gradients[x][y][z] = new THREE.Vector3(0.0, 1.0, 0.0);
+                    }
+
+                }
+            }
+        }
+
         var t0 = performance.now();
         updateCells(i, j, k, paintRadii);
         this.generateMesh();

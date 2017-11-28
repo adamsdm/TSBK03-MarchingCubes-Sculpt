@@ -39,7 +39,9 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x42cbf4 );
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({
+        antialias: true,
+    });
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -150,7 +152,13 @@ function displayGUI(){
         } 
     };
 
-    gui.add(obj, 'save').name('Save terrain');;
+    gui.add(
+        {
+            save: function () {
+                saveToObj(volume.mesh);
+            }
+        }, 'save')
+        .name('Save terrain');
 
     var debugFolder = gui.addFolder('Debug');
     

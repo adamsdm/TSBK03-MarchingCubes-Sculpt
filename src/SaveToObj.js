@@ -6,8 +6,6 @@ function saveToObj(mesh){
 
     var blob = new Blob([objText], { type: "text/plain;charset=utf-8" });
     saveAs(blob, "MyTerrain.obj");
-    
-    
 
 }
 
