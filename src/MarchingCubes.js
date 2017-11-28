@@ -413,6 +413,10 @@ function MarchingCubes(size, resolution){
         }
     };
 
+    /**
+     * Performs the actual marching cubes algorithm and inserts vertices and faces accordingly
+     * @param {Object} gridCell 
+     */
     this.polygonise = function(gridCell)
     {
         var cubeindex = 0;
