@@ -248,11 +248,13 @@ function onMouseMove( event ) {
     var intersects = raycaster.intersectObject( mesh );
     // Toggle rotation bool for meshes that we clicked
     if ( intersects.length > 0 ) {
-   
+        helper.visible = true;
         helper.position.set( 0, 0, 0 );
         helper.lookAt( intersects[ 0 ].face.normal );
         helper.position.copy( intersects[ 0 ].point );    
 
+    } else {
+        helper.visible = false;
     }
 }
 
