@@ -355,32 +355,32 @@ function MarchingCubes(size, resolution){
 
         var paintRadii = parameters.paintSize;
 
-
         // Update data
-        for (var x = i - paintRadii; x < i + paintRadii; x++)
+        for (var x = Math.max(i - paintRadii, 0); x < Math.min(i + paintRadii, resolution); x++)
         {
-            for (var y = j - paintRadii; y < j + paintRadii; y++)
+            for (var y = Math.max(j - paintRadii, 0); y < Math.min(j + paintRadii, resolution); y++)
             {
-                for (var z = k - paintRadii; z < k + paintRadii; z++)
+                for (var z = Math.max(k - paintRadii, 0); z < Math.min(k + paintRadii, resolution); z++)
                 {
                     // distance from center to currently evaluated point
                     var distance = dist(i,j,k,x,y,z);
                     if ( distance < paintRadii ) {
                         var newIso = this.isoValue +
                             ( paintRadii / (distance + 1) - ((paintRadii + 1) / paintRadii)) * offset;
-                        if ( newIso < this.data[x][y][z] && offset < 0)
-                            this.data[x][y][z] = newIso;
-                        else if ( newIso > this.data[x][y][z] && offset > 0 )
-                            this.data[x][y][z] = newIso;
+                            if (newIso < this.data[x][y][z] && offset < 0)
+                                this.data[x][y][z] = newIso;
+                            else if (newIso > this.data[x][y][z] && offset > 0)
+                                this.data[x][y][z] = newIso;
+
                     }
                 }
             }
         }
 
         // Update gradients
-        for (var x = i - paintRadii; x < i + paintRadii; x++){
-            for (var y = j - paintRadii; y < j + paintRadii; y++){
-                for (var z = k - paintRadii; z < k + paintRadii; z++){
+        for (var x = Math.max(i - paintRadii, 0); x < Math.min(i + paintRadii, resolution); x++){
+            for (var y = Math.max(j - paintRadii, 0); y < Math.min(j + paintRadii, resolution); y++){
+                for (var z = Math.max(k - paintRadii, 0); z < Math.min(k + paintRadii, resolution); z++){
                     try {
                         gradients[x][y][z] = new THREE.Vector3();
                         gradients[x][y][z].x = -0.5 * ((data[x - 1][y][z] - data[x + 1][y][z]) / this.dx)
@@ -395,6 +395,7 @@ function MarchingCubes(size, resolution){
         }
 
         var t0 = performance.now();
+        console.log( "i = " + i + " j = " + j + " k = " + k);
         updateCells(i, j, k, paintRadii);
         this.generateMesh();
         console.log( "number of vertices after paint: " + this.geometry.vertices.length);
@@ -618,21 +619,22 @@ function MarchingCubes(size, resolution){
 
     function updateCells(x, y, z, paintRadii)
     {
-        for ( var i = x - paintRadii; i < x + paintRadii; i ++ ) {
-            for ( var j = y - paintRadii; j < y + paintRadii; j ++ ) {
-                for ( var k = z - paintRadii; k < z + paintRadii; k ++ ) {
+
+        for ( var i = Math.max(x - paintRadii, 0); i < Math.min(x + paintRadii, resolution) - 1; i++) {
+            for ( var j = Math.max(y - paintRadii, 0); j < Math.min(y + paintRadii, resolution) - 1; j++) {
+                for ( var k = Math.max(z - paintRadii, 0); k < Math.min(z + paintRadii, resolution) - 1; k++ ) {
                     var isoValues = [];
                     var gradients = [];
                     //create a grid cell
                     //isoValues contains the isovalue at each vertex/corner of the cube
 
-                    //bottom verrices of cube
+                    //bottom vertices of cube
                     isoValues.push(this.data[i  ][j  ][k  ]);   gradients.push(this.gradients[i  ][j  ][k  ]);
                     isoValues.push(this.data[i+1][j  ][k  ]);   gradients.push(this.gradients[i+1][j  ][k  ]);
                     isoValues.push(this.data[i+1][j  ][k+1]);   gradients.push(this.gradients[i+1][j  ][k+1]);
                     isoValues.push(this.data[i  ][j  ][k+1]);   gradients.push(this.gradients[i  ][j  ][k+1]);
 
-                    //top verrices of cube
+                    //top vertices of cube
                     isoValues.push(this.data[i  ][j+1][k  ]);   gradients.push(this.gradients[i  ][j+1][k  ]);
                     isoValues.push(this.data[i+1][j+1][k  ]);   gradients.push(this.gradients[i+1][j+1][k  ]);
                     isoValues.push(this.data[i+1][j+1][k+1]);   gradients.push(this.gradients[i+1][j+1][k+1]);
