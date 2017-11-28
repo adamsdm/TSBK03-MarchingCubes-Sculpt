@@ -360,8 +360,14 @@ function MarchingCubes(size, resolution){
             {
                 for (var z = k - paintRadii; z < k + paintRadii; z++)
                 {
-                    if ( dist(i, j, k, x, y, z) < paintRadii)
-                        this.data[x][y][z] = this.isoValue + offset;
+                    // distance from center to currently evaluated point
+                    var distance = dist(i,j,k,x,y,z);
+                    if ( distance < paintRadii ) {
+                        var newIso = this.isoValue +
+                            ( paintRadii / (distance + 1) - ((paintRadii + 1) / paintRadii)) * offset;
+                        if ( newIso < this.data[x][y][z] )
+                            this.data[x][y][z] = newIso;
+                    }
                 }
             }
         }
