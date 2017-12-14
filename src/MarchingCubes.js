@@ -327,7 +327,9 @@ function MarchingCubes(size, resolution){
         ];
         initCells();
         // Generate mesh
+
         this.generateMesh();
+
 
         // DEBUG //
         
@@ -350,8 +352,6 @@ function MarchingCubes(size, resolution){
             return;
 
         console.log("PAINTING..");
-
-        console.log( "number of vertices before paint: " + this.geometry.vertices.length);
 
         var paintRadii = parameters.paintSize;
 
@@ -383,9 +383,9 @@ function MarchingCubes(size, resolution){
                 for (var z = Math.max(k - paintRadii, 0); z < Math.min(k + paintRadii, resolution); z++){
                     try {
                         gradients[x][y][z] = new THREE.Vector3();
-                        gradients[x][y][z].x = -0.5 * ((data[x - 1][y][z] - data[x + 1][y][z]) / this.dx)
-                        gradients[x][y][z].y = -0.5 * ((data[x][y - 1][z] - data[x][y + 1][z]) / this.dy)
-                        gradients[x][y][z].z = -0.5 * ((data[x][y][z - 1] - data[x][y][z + 1]) / this.dz)
+                        gradients[x][y][z].x = -0.5 * ((data[x - 1][y][z] - data[x + 1][y][z]) / this.dx);
+                        gradients[x][y][z].y = -0.5 * ((data[x][y - 1][z] - data[x][y + 1][z]) / this.dy);
+                        gradients[x][y][z].z = -0.5 * ((data[x][y][z - 1] - data[x][y][z + 1]) / this.dz);
                     } catch (e) {
                         gradients[x][y][z] = new THREE.Vector3(0.0, 1.0, 0.0);
                     }
@@ -395,10 +395,8 @@ function MarchingCubes(size, resolution){
         }
 
         var t0 = performance.now();
-        console.log( "i = " + i + " j = " + j + " k = " + k);
         updateCells(i, j, k, paintRadii);
         this.generateMesh();
-        console.log( "number of vertices after paint: " + this.geometry.vertices.length);
         var t1 = performance.now();
         console.log("initCells() took " + (t1-t0) + "ms");
     };
@@ -431,7 +429,16 @@ function MarchingCubes(size, resolution){
                 }
             }
         }
-        
+
+       /* var occlusion = new Float32Array(this.geometry.vertices.length);
+        var t0 = performance.now();
+        occlusion = calcAmbientOcclusion();
+        var t1 = performance.now();
+        console.log("AO took :" + (t1-t0) + " ms");
+        // send occlusion values to shader as attributes
+        this.geometry.addAttribute('occlusion', new THREE.BufferAttribute(occlusion,1));*/
+
+
         // Huge performance bottleneck and redundant since we calculate vertex normals manually
         // this.geometry.computeFaceNormals();
         // this.geometry.computeVertexNormals();
@@ -617,12 +624,66 @@ function MarchingCubes(size, resolution){
         
     }
 
+
+    function calcAmbientOcclusion( )
+    {
+        var rays = [];
+        for (var x = -1; x < 1; x++)
+        {
+            for (var y = -1; y < 1; y++)
+            {
+                for (var z = -1; z < 1; z++)
+                {
+                    var dir = new THREE.Vector3(x, y, z);
+                    rays.push(dir);
+                }
+            }
+        }
+
+        var verts = [];
+        for ( var v_ind = 0; v_ind < this.geometry.vertices.length; v_ind++ )
+        {
+            var v_i = Math.round((this.geometry.vertices[v_ind].x / volume.dx) + (volume.resolution / 2));
+            var v_j = Math.round((this.geometry.vertices[v_ind].y / volume.dy) + (volume.resolution / 2));
+            var v_k = Math.round((this.geometry.vertices[v_ind].z / volume.dz) + (volume.resolution / 2));
+
+            verts.push(new THREE.Vector3(v_i, v_j, v_k));
+        }
+
+        var vertsOcclusion = new Float32Array(verts.length);
+        var occlusion;
+        for ( var verts_ind = 0; verts_ind < verts.length ; verts_ind++ )
+        {
+            occlusion = 0;
+            for ( var ray_ind = 0; ray_ind < rays.length; ray_ind++)
+            {
+                for ( var step = 1; step < 5; step++) {
+                    try {
+                        var temp = this.data[verts[verts_ind].x + rays[ray_ind].x * step][verts[verts_ind].y + rays[ray_ind].y * step][verts[verts_ind].z + rays[ray_ind].z * step];
+                    }
+                    catch (e) {
+                        temp = -1;
+                    }
+                    if (temp > 0) {
+                        occlusion++;
+                        break;
+                    }
+                }
+            }
+            occlusion /= rays.length;
+            vertsOcclusion[verts_ind] = occlusion;
+        }
+
+        return vertsOcclusion;
+
+    }
+
+
     function updateCells(x, y, z, paintRadii)
     {
-
-        for ( var i = Math.max(x - paintRadii, 0); i < Math.min(x + paintRadii, resolution) - 1; i++) {
-            for ( var j = Math.max(y - paintRadii, 0); j < Math.min(y + paintRadii, resolution) - 1; j++) {
-                for ( var k = Math.max(z - paintRadii, 0); k < Math.min(z + paintRadii, resolution) - 1; k++ ) {
+        for ( var i = Math.max(x - paintRadii, 0); i < Math.min(x + paintRadii, resolution - 1) ; i++) {
+            for ( var j = Math.max(y - paintRadii, 0); j < Math.min(y + paintRadii, resolution - 1) ; j++) {
+                for ( var k = Math.max(z - paintRadii, 0); k < Math.min(z + paintRadii, resolution - 1) ; k++ ) {
                     var isoValues = [];
                     var gradients = [];
                     //create a grid cell
@@ -740,13 +801,15 @@ function MarchingCubes(size, resolution){
                     // low freq + high amplitude -> more caves and arches
                     // medium freq + low amplitude -> ropey, organic terrain
 
-                    var warpFreq = 0.1;
-                    var warpAmplitude = 2.0;
+                    var warpFreq = 0.04;
+                    var warpAmplitude = 1.4;
                     var warp =  noise.simplex3(pos.x * warpFreq, pos.y * warpFreq, pos.z * warpFreq);
+
 
                     pos.x += warpAmplitude * warp;
                     pos.y += warpAmplitude * warp;
                     pos.z += warpAmplitude * warp;
+                    noiseSum = pos.y;
 
                     var freqIndex = 0;
                     var freqs = [0.01, 0.0214, 0.0397, 0.0809, 0.162, 0.318, 0.645, 1.199, 2.403];
